@@ -1,0 +1,44 @@
+<script type="text/javascript" src="assets/js/jquery-2.0.3.min.js"></script>
+<script  type="text/javascript" src="assets/js/common.js"> </script>
+<script  type="text/javascript" src="/js/constant.js"> </script>
+<form id="deliveryOrderForm">
+    <table class="table table-responsive">
+        <tr>
+            <td> 选择物流公司</td>
+            <td> <select id="deliveryCompany" name="deliveryCompany"> </select> </td>
+        </tr>
+        <tr>
+            <td>物流单前缀</td>
+            <td><input name="deliveryNumberPre" type="text"> </td>
+        </tr>
+        <tr>
+            <td> 物流单号的范围</td>
+            <td> <input  text="text" name="number_left"> <input text="text" name="number_right"></td>
+        </tr>
+        <tr >
+            <td> <input type="button" onclick="addDeliveryNumber()" value="提交">  </td>
+            <td> <input type="button" value="清空">  </td>
+        </tr>
+    </table>
+</form>
+
+
+<script>
+     fillSelect(Constants.DeliveryCompany , $('#deliveryCompany') );
+     //$('#deliveryOrderForm').serialize();
+     function addDeliveryNumber()
+     {
+         var  formData=    $('#deliveryOrderForm').serialize();
+         console.log(formData);
+         $.get('/shipping/addDeliveryNumber?'+formData , function (response) {
+             if(response.status==1)
+             {
+                  alert('添加成功');
+             }else
+             {
+                 alert(response.msg);
+             }
+         })
+         return false;
+     }
+</script>

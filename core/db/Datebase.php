@@ -1,13 +1,49 @@
 <?php
 namespace  core\db;
 
-abstract class   Datebase{
+interface   Datebase{
 
-    abstract public function query($sql);
+    public function query($sql);
 
-    abstract public function execute($sql);
+    public function execute($sql);
 
-    abstract public function getLastSql();
+    public function getLastSql();
 
-    abstract public function   getError();
+    public function  getError();
+
+    public function  update($data,$condition,$table);
+
+    public function  insert($data,$table);
+
+    /***
+     * 获取第一行
+     * @param $sql
+     * @return mixed
+     */
+    public function  queryOne($sql);
+
+    /***
+     * 获取第一行第一个数据
+     * @param $sql
+     * @return mixed
+     */
+    public function   queryScalar($sql);
+
+    /***
+     *  获取所以数据
+     * @param $sql
+     * @return mixed
+     */
+    public function   queryAll($sql , $limit=0);
+
+    /***
+     *  将数组中的一个字段作为主键
+     * @param $sql
+     * @param $field
+     * @return mixed
+     */
+    public function  transform($sql , $field);
+
+
+
 }

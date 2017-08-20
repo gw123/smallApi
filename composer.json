@@ -1,0 +1,15 @@
+{
+    "name": "gw/small-api",
+    "require": {},
+
+    "repositories": [
+        {
+            "packagist": false
+        },
+        {
+            "type": "composer",
+            "url": "http://packagist.cn"
+        }
+    ]
+
+}

@@ -1,0 +1,23 @@
+
+{% extends "/layout/homeLayout.twig" %}
+
+{% block pageAssert %}
+    <link rel="stylesheet" href="/assets/css/jquery-ui-1.10.3.full.min.css" />
+{% endblock %}
+
+{% block content %}
+    <table class="table table-responsive table-hover">
+        <thead>
+          <tr> <th>组名</th> <th>描述</th> <th>分配权限</th><th>查看权限</th></tr>
+        </thead>
+        <tbody>
+         {% for row in rows %}
+             <tr>
+                 <td> {{row.gname}}</td>  <td> {{row.remarks}}</td>
+                 <td> <a href="/admin/assignRoleAction?roleId={{ row.gid }}" target="_blank">分配权限 </a> </td>
+                 <td> <a href="/admin/assignRoleAction?roleId={{ row.gid }}" target="_blank">查看权限 </a>  </td>
+             </tr>
+         {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

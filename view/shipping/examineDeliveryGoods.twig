@@ -1,0 +1,73 @@
+{% extends "/layout/homeLayout.twig" %}
+
+{% block pageAssert %}
+    <link rel="stylesheet" href="/assets/css/jquery-ui-1.10.3.full.min.css" />
+    <link rel="stylesheet" href="/assets/css/datepicker.css" />
+    <link rel="stylesheet" href="/assets/css/ui.jqgrid.css" />
+{% endblock %}
+
+{% block content %}
+
+    <form id="deliveryOrderForm" action="">
+        <table class="table-responsive">
+            <tr>
+                <td>请输入你要检测的物流单号</td>
+                <td><input name="orderNo[]" type="text"> </td>
+                <td><input class="btn btn-sm btn-warning" id="submit" type="submit"> </td>
+            </tr>
+        </table>
+    </form>
+    <hr>
+
+    <div id="ordersInfo">
+        {% for order in orders %}
+            <table class="table table-responsive table-bordered " style="text-align: center;">
+                <caption>
+                    <span><h4 style="display: inline-block">订单号: {{ order.order_id }} </h4> </span>
+                    <button class="pull-left btn btn-primary btn-sm" onclick="Zhiwo.Delivery.beginExamine()"> 扫描这个订单</button>
+                    <button class="pull-left btn btn-primary btn-sm" onclick="Zhiwo.Delivery.scanExamineConfirm()"> 测试确扫描</button>
+                </caption>
+                <thead>
+                <tr>  <td width="15%"> 商品名</td> <td width="5%"> 数量</td> <td width="50%">  商品sku列表</td>  </tr>
+                </thead>
+                <tbody>
+
+                {% for good  in order.goods_list %}
+                    <tr>
+                        <td rowspan="{{ loop.length }}" style="vertical-align:middle" > {{ good.name }}</td>
+                        <td rowspan="{{ loop.length }}" style="vertical-align:middle"> {{ good.quantity }}</td>
+                        <td colspan="3" style="padding: 0px;">
+                            <table class="table table-responsive table-bordered table-hover" style="margin-bottom: 0px">
+                                <thead>
+                                <tr>  <td width="15%"> sku</td> <td width="15%"> 条形码</td> <td width="5%"> 扫描数量</td>  </tr>
+                                </thead>
+                                {% for sku  in good.sku_list %}
+                                    <tr>
+                                        <td width="15%" id=""> {{ sku.sku }}</td>
+                                        <td width="15%"> {{ sku.barcode }}</td>
+                                        <td width="5%"> 0 </td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+            </table>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script type="application/javascript" src="/assets/js/app/storage/Zhiwo.Delivery.js"
+    <script>
+
+    </script>
+{% endblock %}
+
+
+
+
+

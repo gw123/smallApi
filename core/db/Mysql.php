@@ -3,12 +3,15 @@ namespace  core\db;
 
 use core\BaseException;
 
-class Mysql  extends Datebase{
-
+class Mysql  implements \core\db\Datebase{
+    /***
+     * @var \mysqli
+     */
     public  $link = null; //数据库连接
     private $table; //表名
     private $prefix; //表前缀
     private $db_config; //数据库配置
+    private $db_name;
     private $error;
     private $_rt = null;
 
@@ -47,6 +50,7 @@ class Mysql  extends Datebase{
         $pwd  = $db_config["password"];
 
         $db_name  = isset($db_config["dbname"]) ? $db_config['dbname'] : '';
+        $this->db_name  = $db_name;
         $db_encode = isset($db_config['charset']) ? $db_config["charset"] : 'utf8';
         $db_port   =isset($db_config['port']) ? $db_config['port'] : 3306;
         $this->prefix = isset($db_config['db_prefix']) ? $db_config["db_prefix"] : '';
@@ -58,6 +62,15 @@ class Mysql  extends Datebase{
         $this->link->query("set names '$db_encode'");
         //mysqli_query("set names '$db_encode'");
     }
+
+    /*** 过滤函数
+     * @param $value
+     * @return string
+     */
+   public function filter($value)
+   {
+      return  mysqli_real_escape_string($this->link ,$value);
+   }
 
     /*获取表有哪些字段*/
     public function  getFields($table)
@@ -136,36 +149,30 @@ class Mysql  extends Datebase{
 
     /**
      * 查询第一行
-     * 参数:sql条件 查询字段 使用的sql函数名
-     * @param string $where
-     * @param string $field
-     * @param string $fun
-     * @return array
      * 返回值:结果集 或 结果(出错返回空字符串)
      */
-    public function queryOne($table="",$where = '', $field = "*")
+    public function queryOne($sqlStr)
     {
-        $res = $this->select($table ,$where,$field);
-
-        if(is_array($res))
-            return $res[0];
-        return null;
+        $rt = $this->link->query($sqlStr);
+        if($rt)
+        {
+            $row = mysqli_fetch_assoc($rt);
+            if($row)  return $row;
+        }
     }
 
     /**
      * 数据查询 主要应用与count 统计类型的语句
-     * 参数:sql条件 查询字段 使用的sql函数名
-     * @param string $where
-     * @param string $field
-     * @param string $fun
-     * @return array
      * 返回值:结果集 或 结果(出错返回空字符串)
      */
     public function queryScalar($sqlStr)
     {
-        $res = $this->select($sqlStr );
-        if(is_array($res))
-            return $res[0][0];
+        $rt = $this->link->query($sqlStr);
+        if($rt)
+        {
+            $row = mysqli_fetch_row($rt);
+            if($row)  return $row[0];
+        }
         return null;
     }
 
@@ -178,7 +185,7 @@ class Mysql  extends Datebase{
      * @return bool
      * 返回值:语句执行成功或失败,执行成功并不意味着对数据库做出了影响
      */
-    public function update($table="",$data="" ,$where="1")
+    public function update($data,$where,$table)
     {
         if($data=="")
             return "do nothing";
@@ -196,8 +203,14 @@ class Mysql  extends Datebase{
             $ddata = mysqli_real_escape_string($this->link,$data);
         }
 
-        if($table=="") $table=$this->table;
-        $sqlStr = "update $table set $ddata where $where";
+        if(empty($table)) $table=$this->table;
+
+
+        if(empty($where))
+            $sqlStr = "update $table set $ddata";
+        else
+            $sqlStr = "update $table set $ddata where $where";
+
         $this->lastSql = $sqlStr;
         return $this->link->query($sqlStr);
     }
@@ -207,14 +220,16 @@ class Mysql  extends Datebase{
     */
     public function  execute($sql)
     {
+        $this->lastSql = $sql;
         return $this->link->query($sql);
     }
 
     public function query($sql)
     {
+        $this->lastSql =$sql;
         $this->_rt = $this->link->query($sql);
-    }
 
+    }
 
     public function  readLine()
     {
@@ -234,7 +249,7 @@ class Mysql  extends Datebase{
      * @return int
      * 返回值:插入的数据的ID 或者 0
      */
-    public function insert($table="",$data)
+    public function insert($data , $table="")
     {
         if($table=="") $table=$this->table;
 
@@ -273,6 +288,7 @@ class Mysql  extends Datebase{
             $sqlStr = "insert into $table values ($idata)";
         }
         $this->lastSql = $sqlStr;
+
         if($this->link->query($sqlStr))
         {
             return mysqli_insert_id($this->link);
@@ -291,6 +307,7 @@ class Mysql  extends Datebase{
         if($table=="") $table=$this->table;
 
         $sqlStr = "delete from $table where $where";
+        $this->lastSql = $sqlStr;
         return $this->link->query($sqlStr);
     }
 
@@ -304,7 +321,7 @@ class Mysql  extends Datebase{
      */
     public function getError()
     {
-        return mysqli_error($this->link);
+        return  mysqli_error($this->link);
     }
 
     /**
@@ -314,5 +331,63 @@ class Mysql  extends Datebase{
     public function close()
     {
         return mysqli_close($this->link);
+    }
+
+
+    public function queryAll($sql, $limit = 0)
+    {
+        $this->lastSql = $sql;
+
+        $rt = $this->link->query($sql);
+
+        if($rt===false)
+        {
+            $this->error =  mysqli_error($this->link) .EOL." SQL: $sql" ;
+            throw  new BaseException($this->error);
+        }
+        $rows = array();
+        while ( $rt &&  $row=mysqli_fetch_assoc($rt) )
+        {
+            array_push($rows ,$row);
+        }
+        return $rows;
+    }
+
+    public function queryColumn($sql)
+    {
+        $this->lastSql = $sql;
+
+        $rt = $this->link->query($sql);
+
+        if($rt===false)
+        {
+            $this->error =  mysqli_error($this->link) .EOL." SQL: $sql" ;
+            throw  new BaseException($this->error);
+        }
+        $rows = array();
+        while ( $rt &&  $row=mysqli_fetch_row($rt) )
+        {
+            array_push($rows ,$row[0]);
+        }
+        return $rows;
+    }
+
+    public function transform($sql, $field)
+    {
+        $this->lastSql = $sql;
+        $rt = $this->link->query($sql);
+
+        if($rt===false)
+        {
+            $this->error =  mysqli_error($this->link) .EOL." SQL: $sql" ;
+            return  false;
+        }
+        $rows = array();
+        while ( $rt &&  $row=mysqli_fetch_assoc($rt) )
+        {
+            //var_dump($field ,$row);
+           $rows[ $row[$field] ] = $row;
+        }
+        return $rows;
     }
 }

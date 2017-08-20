@@ -10,7 +10,7 @@ class  Log extends Component {
     //调试服务器地址
     public     $serverURL='xytschool.com:8080';
     //  令牌 有两个作用 1. 区分会话 ,  2 . 安全验证  默认为token 为了安全请在实际使用中替换
-    public     $token = '17ky';
+    public     $token = 'xytschool';
     // 是否禁止调试
     public     $forbidden = false;
     public     $showInRun = false;
