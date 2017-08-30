@@ -1,2 +1,0 @@
-[06:24:03][waring] :PrintDeliveryData:1612021606438 deficiencies
-[06:25:00][waring] :PrintDeliveryData:1612021606438 deficiencies

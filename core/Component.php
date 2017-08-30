@@ -2,31 +2,70 @@
 namespace core;
 
 use core\App;
+use core\Event;
 
 class Component{
 
-    private static $_e = [];
+    static $_e = [];
 
-    public function on($eventName ,$callback){
-          if(! isset( self::$_e[$eventName] ) )
-          {
-              self::$_e[$eventName] = [];
-              self::$_e[$eventName][] = $callback;
-          }else{
-              if( !array_search($callback,self::$_e[$eventName]) )
-              {
-                  self::$_e[$eventName][] = $callback;
-              }else{
-                  App::$log->out( $callback.'该方法已经注册' );
-              }
-          }
+
+
+    public function on($name, $handler, $data = null, $append = true)
+    {
+        if ($append || empty($this->_e[$name])) {
+            $this->_e[$name][] = [$handler, $data];
+        } else {
+            array_unshift($this->_e[$name], [$handler, $data]);
+        }
     }
 
-    public function trigger($eventName ,$data=null){
-        $event = new Event($eventName , $this ,$data);
-        $this->raiseEvent($eventName , $event );
+    public function off($name, $handler = null)
+    {
+        if (empty($this->_e[$name])) {
+            return false;
+        }
+        if ($handler === null) {
+            unset($this->_e[$name]);
+            return true;
+        }
+
+        $removed = false;
+        foreach ($this->_e[$name] as $i => $event) {
+            if ($event[0] === $handler) {
+                unset($this->_e[$name][$i]);
+                $removed = true;
+            }
+        }
+        if ($removed) {
+            $this->_e[$name] = array_values($this->_e[$name]);
+        }
+        return $removed;
     }
 
+
+    public function trigger($name, Event $event = null)
+    {
+        if (!empty($this->_e[$name])) {
+            if ($event === null) {
+                $event = new Event;
+            }
+            if ($event->sender === null) {
+                $event->sender = $this;
+            }
+            $event->handled = false;
+            $event->name = $name;
+            foreach ($this->_e[$name] as $handler) {
+                $event->data = $handler[1];
+                call_user_func($handler[0], $event);
+                // stop further handling if the event is handled
+                if ($event->handled) {
+                    return;
+                }
+            }
+        }
+        // invoke class-level attached handlers
+        Event::trigger($this, $name, $event);
+    }
     /***
      * @param $name
      * @param $event

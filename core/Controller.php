@@ -1,7 +1,7 @@
 <?php
 namespace  core;
 
-class    Controller {
+class   Controller {
 
     public  function  asJson($data)
     {
@@ -65,15 +65,16 @@ class    Controller {
         {
             return   "模板文件不存在 ".ROOT_PATH."/view/".$filePath;
         }
-
+        //var_dump(All::$app->view);
+        return All::$app->view->render($filePath,$data);
         //$loader = new Twig_Loader_String();
         //$twig =   new \Twig_Environment($loader);
         //echo $twig->render('Hello !', array('name' => 'Fabien'));
-        $config = isset(App::$config['twig'])?App::$config['twig']:[];
 
-        $loader = new \Twig_Loader_Filesystem(ROOT_PATH.'/view');
-        $twig =   new \Twig_Environment($loader, $config);
-        return $twig->render($filePath, $data);
+        //  $config = isset(App::$config['twig'])?App::$config['twig']:[];
+        // $loader = new \Twig_Loader_Filesystem(ROOT_PATH.'/view');
+        // $twig =   new \Twig_Environment($loader, $config);
+        // return $twig->render($filePath, $data);
 
     }
 

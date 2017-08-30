@@ -21,10 +21,10 @@ class Mysql  implements \core\db\Datebase{
      * @param $table
      * @param string $db_config_arr_path
      */
-    function __construct( $db_config )
+    function __construct( $db_config =[])
     {
         $this->db_config = $db_config;
-        $this->conn();
+
     }
 
     function __destruct()
@@ -330,7 +330,8 @@ class Mysql  implements \core\db\Datebase{
      */
     public function close()
     {
-        return mysqli_close($this->link);
+        if($this->link)
+         mysqli_close($this->link);
     }
 
 

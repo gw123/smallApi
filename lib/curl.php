@@ -1,6 +1,8 @@
 <?php
 namespace lib;
 
+use core\Controller;
+
 class  Curl {
 protected $_useragent = 'Mozilla/4.1 (compatible; MSIE 6.0; Windows NT 5.1';
 protected $_content_Type = 'Content-Type: application/x-www-form-urlencoded; charset=utf-8';
@@ -36,7 +38,7 @@ public function setPass($pass){
 $this->auth_pass = $pass;
 }
 
-public function __construct($url,$followlocation = true,$timeOut = 30,$maxRedirecs = 4,$binaryTransfer = false,$includeHeader = false,$noBody = false)
+public function __construct(string $url,$followlocation = true,$timeOut = 30,$maxRedirecs = 4,$binaryTransfer = false,$includeHeader = false,$noBody = false)
 {
 $this->_url = $url;
 $this->_followlocation = $followlocation;
