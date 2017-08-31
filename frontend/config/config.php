@@ -3,7 +3,7 @@
 /* 数据库配置 */
 $config =  array(
         'param'=> require (ROOT_PATH.'/config/param.php'),
-        'components'=>array(
+        'components'=>[
             'caiji' => array(
                 'class'=> core\db\Mysql::class,
                 //数据库配置
@@ -28,16 +28,15 @@ $config =  array(
             'view'=> array(
                 'class'=> core\view\TwigView::class,
                 'cache'=>false,
-                'twigConfig'=>array(
+                'twigConfig'=>[
                     'debug'=>true,
                     'charset'=>'utf-8',
-                    'cache '=> APP_PATH."/runtime/view",
-                    'viewRootPath '=> APP_PATH.'/view',
+                    'cache '=> ROOT_PATH."/runtime/view",
                     'auto_reload'=>true,
                     'optimizations '=>'-1',//优化方式的标志(-1，启用所有优化; 0禁用)
-                )
+                ]
             )
-        )
+        ]
 );
 
 return $config;

@@ -1,5 +1,5 @@
 <?php
-namespace controller;
+namespace frontend\controller;
 use core\App;
 use core\Controller;
 use service\enums\ShipEnum;

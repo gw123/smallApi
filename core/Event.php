@@ -66,6 +66,7 @@ class Event extends Object
                 $removed = true;
             }
         }
+        // 可能是为了处理一个bug
         if ($removed) {
             self::$_events[$name][$class] = array_values(self::$_events[$name][$class]);
         }

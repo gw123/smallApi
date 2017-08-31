@@ -1,5 +1,5 @@
 <?php
-namespace controller;
+namespace frontend\controller;
 use core\Session;
 use core\Controller;
 use  service\dal\UserModel;

@@ -1,6 +1,5 @@
 <?php
-namespace controller;
-//use core\App;
+namespace frontend\controller;
 use core\All;
 use core\Controller;
 use lib\Curl;

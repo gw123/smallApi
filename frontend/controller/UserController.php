@@ -1,5 +1,5 @@
 <?php
- namespace controller;
+namespace frontend\controller;
 use core\Controller;
 use  service\dal\UserModel;
  class UserController extends Controller{

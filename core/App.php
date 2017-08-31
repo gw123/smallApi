@@ -5,7 +5,9 @@ use  core\Container;
 use core\exceptions\InvalidConfigException;
 
 /***
- * Class App
+ * @property \core\db\Mysql $db The database connection. This property is read-only.
+ * @property \core\view $view The database connection. This property is read-only.
+ * @property \lib\Log $log The database connection. This property is read-only.
  * @package core
  */
 class App extends Component{
@@ -19,19 +21,6 @@ class App extends Component{
      */
     private $_definitions = [];
 
-    /***
-     * @var \lib\Log
-     */
-     public  $log;
-
-    /***
-     * @var \core\db\Mysql;
-     */
-     public    $db  = null;
-    /***
-     * @var \core\view
-     */
-     public    $view = null;
      //App参数
      public    $param = array();
 
@@ -39,8 +28,9 @@ class App extends Component{
      {
          if(isset($config['components']))
           $this->setComponents($config['components']);
-          $this->db = $this->get('db');
-          $this->view =$this->get('view');
+//          $this->db = $this->get('db');
+//          $this->view =$this->get('view');
+//          $this->log = $this->get('log');
 //         $this->db      =  new  \core\db\Mysql($this->config['db']);
 //         $this->db_ecstore = new  \core\db\Mysql($this->config['ecstore']);
 //         $this->log     =  new  \lib\Log();
@@ -75,14 +65,13 @@ class App extends Component{
                 return $this->_components[$id] = All::createObject($definition);
             }
         } elseif ($throwException) {
-
             throw new InvalidConfigException("Unknown component ID: $id");
         } else {
             return null;
         }
     }
 
-    public function set($id, $definition)
+    public function set($id,array $definition)
     {
         if ($definition === null) {
             unset($this->_components[$id], $this->_definitions[$id]);
@@ -91,18 +80,10 @@ class App extends Component{
 
         unset($this->_components[$id]);
 
-        if (is_object($definition) || is_callable($definition, true)) {
-            // an object, a class name, or a PHP callable
+        if (isset($definition['class'])) {
             $this->_definitions[$id] = $definition;
-        } elseif (is_array($definition)) {
-            // a configuration array
-            if (isset($definition['class'])) {
-                $this->_definitions[$id] = $definition;
-            } else {
-                throw new InvalidConfigException("The configuration for the \"$id\" component must contain a \"class\" element.");
-            }
         } else {
-            throw new InvalidConfigException("Unexpected configuration type for the \"$id\" component: " . gettype($definition));
+            throw new InvalidConfigException("The configuration for the \"$id\" component must contain a \"class\" element.");
         }
     }
 

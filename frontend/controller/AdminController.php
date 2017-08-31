@@ -1,10 +1,10 @@
 <?php
- namespace controller;
- use core\Session;
+namespace frontend\controller;
+use core\Session;
 use core\Controller;
- use lib\TreeUtils;
- use  service\dal\UserModel;
- use service\sys\RoleService;
+use lib\TreeUtils;
+use service\dal\UserModel;
+use service\sys\RoleService;
 
  class AdminController extends BackendController{
 

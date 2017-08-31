@@ -1,7 +1,7 @@
 <?php
 namespace  core;
-
-class   Controller {
+use core\Component;
+class   Controller extends Container {
 
     public  function  asJson($data)
     {
@@ -61,9 +61,9 @@ class   Controller {
             $filePath  =CONTROLLER."/".$filePath.".twig";
         }
 
-        if(!is_file(ROOT_PATH."/view/".$filePath))
+        if(!is_file(APP_PATH."/view/".$filePath))
         {
-            return   "模板文件不存在 ".ROOT_PATH."/view/".$filePath;
+            return   "模板文件不存在 ".APP_PATH."/view/".$filePath;
         }
         //var_dump(All::$app->view);
         return All::$app->view->render($filePath,$data);
