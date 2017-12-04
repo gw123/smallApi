@@ -20,11 +20,10 @@ define('SESSION_ID_PRE','SESSION_');
 class All{
 
     public static  $routers ;
-    /***
-     * @var \core\db\Mysql;
-     */
-    public  static $db;
 
+    /***
+     * @var \core\App;
+     */
     public  static $app;
     /***
      * @var \core\Container
@@ -40,6 +39,8 @@ class All{
     public  static  function autoload($class)
     {
         $class = str_replace( '\\' , '/' , $class );
+        //支持yii 命名空间
+        $class = str_replace( 'yii/' ,'core/',$class );
         $file = ROOT_PATH."/".$class.".php";
 
         if (is_file($file)) {

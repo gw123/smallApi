@@ -36,17 +36,11 @@ class  IndexController extends Controller
       }
     }
 
-    public function    testAction()
+    public function   testAction()
     {
-        $container = new \core\Container();
-        All::$app->get('db');
-        return $this->render('index');
-        #new Curl('s123');
-        #$container->set('lib\curl',['a'=>1]);
-        #$curl= $container->get('lib\curl',['http://baidu.com','false']);
-        //$curl= $container->get('lib\curl',['http://baidu.com']);
-        //var_dump($curl);
-        #$container->set('controller\AdminController');
+      $all=  All::$app->db->createCommand('show tables')->queryAll();
+
+      var_dump($all);
     }
 }
 

@@ -5,7 +5,8 @@ use  core\Container;
 use core\exceptions\InvalidConfigException;
 
 /***
- * @property \core\db\Mysql $db The database connection. This property is read-only.
+ * @property \yii\db\Connection $db The database connection. This property is read-only.
+ * @property \core\redis\RedisClient $redis The database connection. This property is read-only.
  * @property \core\view $view The database connection. This property is read-only.
  * @property \lib\Log $log The database connection. This property is read-only.
  * @package core
@@ -28,13 +29,13 @@ class App extends Component{
      {
          if(isset($config['components']))
           $this->setComponents($config['components']);
-//          $this->db = $this->get('db');
-//          $this->view =$this->get('view');
-//          $this->log = $this->get('log');
-//         $this->db      =  new  \core\db\Mysql($this->config['db']);
-//         $this->db_ecstore = new  \core\db\Mysql($this->config['ecstore']);
-//         $this->log     =  new  \lib\Log();
-//         $this->param   =  $config['param'];
+    //          $this->db = $this->get('db');
+    //          $this->view =$this->get('view');
+    //          $this->log = $this->get('log');
+    //         $this->db      =  new  \core\db\Mysql($this->config['db']);
+    //         $this->db_ecstore = new  \core\db\Mysql($this->config['ecstore']);
+    //         $this->log     =  new  \lib\Log();
+    //         $this->param   =  $config['param'];
      }
 
      public  function run()

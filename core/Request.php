@@ -27,12 +27,12 @@ class  Request
     public  $_controller;
     public  $_action;
 
-    public  function __construct(&$request ,&$response,&$redis,&$db=null)
+    public  function __construct(&$request ,&$response)
     {
         $this->request = $request;
         $this->response = $response;
-        $this->redis =$redis;
-        $this->db = $db;
+        $this->redis = ALL::$app->redis->connection;
+        $this->db = ALL::$app->db;
         $this->parseRequest($request);
         $this->session_start();
     }

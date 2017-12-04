@@ -56,8 +56,7 @@ $http->set(array(
 ));
 
 #redis
-$redisCli = new Redis;
-$redisCli->connect('0.0.0.0', 6379);
+
 
 #初始化全局缓冲（分类，user基本信息） 可以通过 redis ， memcache ， 共享内存实现
 $http->on("start", function ($server) {
@@ -77,6 +76,7 @@ $http->on('WorkerStart', function ($serv, $worker_id){
     getPid($str);
     require('core/All.php');
     require('core/Request.php');
+    require('core/Yii.php');
 });
 
 /**
@@ -95,9 +95,8 @@ $http->on('onWorkerStop', function ($serv, $worker_id){
  */
 $http->on("request", function ($request, $response) {
 
-    global $redisCli;
     // getPid('http on request Count:'.$count." ");
-    $baseRequest = new \core\Request($request , $response,$redisCli );
+    $baseRequest = new \core\Request($request , $response );
     $result = $baseRequest->runRouter();
 
     if( $result===false )
