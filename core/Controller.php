@@ -3,16 +3,36 @@ namespace  core;
 use core\Component;
 class   Controller extends Container {
 
+    /***
+     * @var \core\Request;
+     */
+    public  $request;
+
+    public  function  __construct( $request  )
+    {
+        $this->request = $request;
+    }
+
     public  function  asJson($data)
     {
-        header('Content-type: application/json');
+        $this->header( 'Content-type','application/json' );
         return json_encode($data);
     }
 
     public  function  asJs($data)
     {
-        header('Content-type: application/x-javascript; charset=utf-8');
-        return  $data;
+        $this->header( 'Content-type',' application/x-javascript; charset=utf-8' );
+        return json_encode($data);
+    }
+
+    public  function  setUtf8()
+    {
+        $this->header( 'Content-type',' text/html;charset=utf-8' );
+    }
+
+    public function header($key ,$value)
+    {
+        $this->request->response->header($key,$value);
     }
 
     public  function  isAjax()
@@ -21,11 +41,12 @@ class   Controller extends Container {
     }
 
     public  function isPost(){
-        return isset($_SERVER['REQUEST_METHOD']) && strtolower($_SERVER['REQUEST_METHOD']) == 'post';
+
+        return isset($this->request->_method) && strtolower($this->request->_method) == 'post';
     }
 
     public function  isGet(){
-        return isset($_SERVER['REQUEST_METHOD']) && strtolower($_SERVER['REQUEST_METHOD']) == 'get';
+        return isset($this->request->_method) && strtolower($this->request->_method) == 'get';
     }
 
     public  function  redirect($url)
@@ -50,15 +71,17 @@ class   Controller extends Container {
      */
     public function  render($filePath ='',$data = array() )
     {
-        if(empty($filePath)) $filePath=ACTION;
+        //设置编码
+        $this->setUtf8();
+        if(empty($filePath)) $filePath = $this->request->_action;
 
         if($filePath[0]=='/')
         {
-            $filePath  =str_replace('.twig' ,'', $filePath);
+            $filePath  = str_replace('.twig' ,'', $filePath);
             $filePath  = $filePath.".twig";
         }else{
-            $filePath  =str_replace('.twig' ,'', $filePath);
-            $filePath  =CONTROLLER."/".$filePath.".twig";
+            $filePath  = str_replace('.twig' ,'', $filePath);
+            $filePath  = lcfirst($this->request->_controller)."/".$filePath.".twig";
         }
 
         if(!is_file(APP_PATH."/view/".$filePath))

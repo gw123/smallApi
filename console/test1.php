@@ -3,7 +3,6 @@
 class Foo{
     public function test(){
         var_dump('get_class',get_class());
-    }
 
     public function test2(){
         var_dump('get_called_class',get_called_class());
@@ -29,3 +28,10 @@ B::test3();
 B::test4();
 Foo::test3();
 Foo::test4();
+
+
+
+//    global $session_table;
+//    $count =$session_table->get('count');
+//    echo "count ".$count;
+//    $ret = $session_table->set( 'count' , $count++);
