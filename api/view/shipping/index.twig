@@ -1,0 +1,447 @@
+
+{% extends "/layout/homeLayout.twig" %}
+
+{% block pageAssert %}
+    <link rel="stylesheet" href="/assets/css/jquery-ui-1.10.3.full.min.css" />
+    <link rel="stylesheet" href="/assets/css/datepicker.css" />
+    <link rel="stylesheet" href="/assets/css/ui.jqgrid.css" />
+{% endblock %}
+
+{% block content %}
+    <style>
+        input{ max-width: 120px;}
+        .two-input{ float: right }
+    </style>
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            <div class="alert alert-info" style="display: none">
+                <i class="icon-hand-right"></i>
+                Please note that demo server is not configured to save the changes, therefore you may get an error message.
+                <button class="close" data-dismiss="alert">
+                    <i class="icon-remove"></i>
+                </button>
+            </div>
+            <!-- 条件筛选表单 -->
+            <form id="orderForm" class=" panel">
+                <table class="admin-table panel-body table-condensed">
+                    <tr>
+                        <td><label>订单号:</label>  </td> <td> <input name="order_id" type="text" > </td>
+                        <td><label>收货人:</label>  </td> <td> <input name="receive_name" type="text"> </td>
+                        <td><label>收货地:</label></td> <td> <input name="receive_addr" type="text"> </td>
+                        <td><label>手&nbsp;&nbsp;&nbsp;&nbsp;机:</label></td> <td> <input name="receive_mobile" type="text"> </td>
+                        <td><label>会员名:</label> </td> <td> <input name="member_name" type="text"> </td>
+                        <td><label>商品ID:</label></td> <td> <input name="goods_id" type="text"> </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"> <select name='ship_status' type="text"> <option> 配送状态 </option> </select> </td>
+                        <td colspan="2"> <select name='reship_status' type="text"> <option> 退货状态 </option> </select> </td>
+                        <td colspan="2"> <select name='order_channel' type="text"> <option> 订单渠道 </option> </select> </td>
+                        <td colspan="4"> <label>价&nbsp;&nbsp;&nbsp;&nbsp;格 :</label>
+                            <div class="two-input"><input name='price_left' type="text"> --- <input name='price_right' type="text"> </div>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td colspan="2"> <select name='delivery_channel' type="text"> <option> 配送渠道 </option> </select> </td>
+                        <td colspan="2"> <select name='delivery_company' type="text"> <option> 物流公司 </option> </select> </td>
+                        <td><label>物流单号:</label>  </td> <td> <input name="delivery_number" type="text"> </td>
+                        <td colspan="4"> <label>时&nbsp;&nbsp;&nbsp;&nbsp;间 :</label>
+                            <div class="two-input"><input name='price_left' type="text"> --- <input name='price_right' type="text"> </div>
+                        </td>
+                        <td colspan="2"> <button id="orderFormSubmit" style="float: right" class=" btn btn-sm btn-primary">搜索</button> </td>
+                    </tr>
+                </table>
+            </form>
+            <!-- 数据表格 -->
+            <table id="grid-table"></table>
+            <div id="grid-pager"></div>
+
+            <script type="text/javascript">
+                var $path_base = "/";//this will be used in gritter alerts containing images
+            </script>
+            <!-- 打印控件 -->
+            <object  id="LODOP_OB" classid="clsid:2105C259-1E0C-4534-8141-A753534CB4CA" width=0 height=0>
+                <embed id="LODOP_EM" type="application/x-print-lodop" width=0 height=0></embed>
+            </object>
+
+            <!-- 订单分配物流模态框（Modal） -->
+            <style>
+                .table td{ font-size:13px;padding: 4px;}
+            </style>
+            <div class="modal fade" id="assignDeliveryModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog" style="width: 800px">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                &times;
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">
+                                订单分配物流
+                            </h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div >
+                                    <select id="deliveryChannelSelect" ></select>
+                                    <button class="btn btn-sm  btn-primary" onclick="Zhiwo.Shipping.assignDelivery()">分配</button>
+                                </div>
+                                <form id="deliveryOrderIdsFrom">
+                                    <table class="table table-responsive">
+                                        <tr>
+                                            <td> 订单号 </td>    <td> 00909099999 </td>
+                                            <td> 物流公司 </td>  <td> 盛经济界解决 </td>
+                                            <td> 物流单号 </td>  <td> 823791023920 </td>
+                                        </tr>
+                                    </table>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="Zhiwo.Shipping.printDelivery()">
+                                打印订单
+                            </button>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal -->
+            </div>
+
+
+            <!-- PAGE CONTENT ENDS -->
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+{% endblock %}
+
+{% block script %}
+    <!--打印控件-->
+    <script src="/assets/js/lodop/loadLodop.js"></script>
+    <script src="/assets/js/app/storage/Zhiwo.Shipping.js"></script>
+    <!-- inline scripts related to this page -->
+    <script type="text/javascript">
+
+        var grid_selector  = "#grid-table";
+        var pager_selector = "#grid-pager";
+        fillSelect(Constants.ShipStatus 	  ,$("[name='ship_status']"));
+        fillSelect(Constants.ReshipStatus ,$("[name='reship_status']"));
+        fillSelect(Constants.OrderChannel ,$("[name='order_channel']"));//delivery_channel
+        fillSelect(Constants.DeliveryChannel ,$("[name='delivery_channel']"));
+        fillSelect(Constants.DeliveryCompany ,$("[name='delivery_company']"));
+
+        $("[name='delivery_channel']").change(function () {
+            var  channel = $(this).val();
+            if(Constants.DeliveryChannel[channel])
+                fillSelect(Constants.DeliveryChannel[channel] ,$("[name='delivery_company']"));
+        })
+        fillSelect(Constants.DeliveryCompany , $('#deliveryChannelSelect'));
+        initForm('orderForm');
+
+        $('#orderFormSubmit').click(function () {
+            var  formArray =$('#orderForm').serializeArray();
+            var  fromData = {};
+            var  query = '';
+            //console.log(formArray); return false;
+            for(var i in formArray)
+            {
+                fromData[formArray[i]['name']] = formArray[i]['value'];
+                query +=formArray[i]['name']+'='+ encodeURI( formArray[i]['value'] )+"&";
+            }
+            query = query.substr(0,query.length-1);
+
+            var parentWindowHash = window.parent.location.hash;
+            parentWindowHash = parentWindowHash.substr(0 , parentWindowHash.indexOf('.html')+5);
+            parentWindowHash +="?"+query;
+            window.parent.location.hash = parentWindowHash;
+            //console.log('parentWindowHash', parentWindowHash);return;
+            window.parent.location.reload();
+            return false;
+        });
+
+        jQuery(function($) {
+            var query = window.location.href;
+            if(query.indexOf('?')!==-1)
+                query =query.substr(query.indexOf('?'));
+            var url = '/order/list'+query
+            jQuery(grid_selector).jqGrid({
+                //direction: "rtl",
+                url: url,
+                datatype: "json",
+                height: 540,
+                colNames:[ '订单号','订单金额','订单备注', '下单日期', '状态','退货','打印数','配货时间','会员名','收货人','收货地','物流公司','物流单号','操作'],
+                colModel:[
+                    {name:'order_id',index:'order_id', width:220, sorttype:"int", editable: true},
+                    {name:'total_amount',index:'total_amount',width:120, editable:true, sorttype:"date",unformat: pickDate},
+                    {name:'message',index:'message', width:140, sorttype:"int", editable: true},
+                    {name:'create_time',index:'create_time', width:120, sorttype:"int", editable: true},
+                    {name:'ship_status',index:'ship_status', width:100,editable: true,editoptions:{size:"20",maxlength:"30"}},
+                    {name:'reship_status',index:'stock', width:100, editable: true,edittype:"checkbox",editoptions: {value:"Yes:No"},unformat: aceSwitch},
+                    {name:'print_status',index:'ship', width:100, editable: true,edittype:"select",editoptions:{value:"FE:FedEx;IN:InTime;TN:TNT;AR:ARAMEX"}},
+                    {name:'picking_time',index:'note', width:120, sortable:false,editable: true,edittype:"textarea", editoptions:{rows:"2",cols:"10"}},
+                    {name:'member_name',index:'sdate',width:120, editable:true, sorttype:"date",unformat: pickDate},
+                    {name:'receive_name',index:'sdate',width:120, editable:true, sorttype:"date",unformat: pickDate},
+                    {name:'receive_province',index:'sdate',width:200, editable:true, sorttype:"date",unformat: pickDate},
+                    {name:'delivery_company',index:'sdate',width:160, editable:true, sorttype:"date",unformat: pickDate},
+                    {name:'delivery_number',index:'sdate',width:120, editable:true, sorttype:"date",unformat: pickDate},
+                    {name:'act',index:'sdate',width:140, editable:"button", editoptions: {value:"编辑"},sorttype:"date",unformat: pickDate},
+                ],
+                viewrecords : true,
+                rowNum:15,
+                rowList:[10,20,30],
+                pager : pager_selector,
+                altRows: true,
+                //toppager: true,
+                multiselect: true,  //多个选择
+                //multikey: "ctrlKey",
+                multiboxonly: true,
+                gridComplete: function(){
+                    var ids = jQuery(grid_selector).jqGrid('getDataIDs');
+                    for(var i=0;i < ids.length;i++){
+                        var cl = ids[i];
+                        be = "<input style='height:22px;width:40px;' type='button' value='查看' onclick=\"viewOrder('"+cl+"')\" />";
+                        se = "<input style='height:22px;width:40px;' type='button' value='重配' onclick=\"jQuery('"+grid_selector+"').editRow('"+cl+"');\" />";
+                        // act 要修改的列  修改内容
+                        jQuery(grid_selector).jqGrid('setRowData',ids[i],{act:be+se}); }
+                },
+
+                loadComplete : function() {
+                    var table = this;
+                    setTimeout(function(){
+                        styleCheckbox(table);
+                        updateActionIcons(table);
+                        updatePagerIcons(table);
+                        enableTooltips(table);
+                    }, 0);
+                },
+                editurl: "order/update", //nothing is saved
+                caption: '<button onclick="Zhiwo.Shipping.printSku();">打印出库单</button> ' +
+                '<button onclick="Zhiwo.Shipping.printInvoice();">打印发货单</button> ' +
+                '<button onclick="Zhiwo.Shipping.examineGoods()">扫描验货</button> ' +
+                '<button data-toggle="modal" data-target="#assignDeliveryModal" onclick="Zhiwo.Shipping.assignDeliveryDisplay()">打印物流单</button> ',
+                autowidth: true
+
+            });
+            //enable search/filter toolbar
+            //jQuery(grid_selector).jqGrid('filterToolbar',{defaultSearch:true,stringResult:true})
+
+            //switch element when editing inline
+            function aceSwitch( cellvalue, options, cell ) {
+                setTimeout(function(){
+                    $(cell) .find('input[type=checkbox]')
+                            .wrap('<label class="inline" />')
+                            .addClass('ace ace-switch ace-switch-5')
+                            .after('<span class="lbl"></span>');
+                }, 0);
+            }
+            //enable datepicker
+            function pickDate( cellvalue, options, cell ) {
+                setTimeout(function(){
+                    $(cell) .find('input[type=text]')
+                            .datepicker({format:'yyyy-mm-dd' , autoclose:true});
+                }, 0);
+            }
+
+            //navButtons
+            jQuery(grid_selector).jqGrid( 'navGrid',pager_selector,
+                    { 	//navbar options
+                        edit: true,
+                        editicon : 'icon-pencil blue',
+                        add: true,
+                        addicon : 'icon-plus-sign purple',
+                        del: true,
+                        delicon : 'icon-trash red',
+                        search: true,
+                        searchicon : 'icon-search orange',
+                        refresh: true,
+                        refreshicon : 'icon-refresh green',
+                        view: true,
+                        viewicon : 'icon-zoom-in grey',
+                    },
+                    {
+                        //edit record form
+                        //closeAfterEdit: true,
+                        recreateForm: true,
+                        beforeShowForm : function(e) {
+                            var form = $(e[0]);
+                            form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar').wrapInner('<div class="widget-header" />')
+                            style_edit_form(form);
+                        }
+                    },
+                    {
+                        //new record form
+                        closeAfterAdd: true,
+                        recreateForm: true,
+                        viewPagerButtons: false,
+                        beforeShowForm : function(e) {
+                            var form = $(e[0]);
+                            form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar').wrapInner('<div class="widget-header" />')
+                            style_edit_form(form);
+                        }
+                    },
+                    {
+                        //delete record form
+                        recreateForm: true,
+                        beforeShowForm : function(e) {
+                            var form = $(e[0]);
+                            if(form.data('styled')) return false;
+
+                            form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar').wrapInner('<div class="widget-header" />')
+                            style_delete_form(form);
+
+                            form.data('styled', true);
+                        },
+                        onClick : function(e) {
+                            alert(1);
+                        }
+                    },
+                    {
+                        //search form
+                        recreateForm: true,
+                        afterShowSearch: function(e){
+                            var form = $(e[0]);
+                            form.closest('.ui-jqdialog').find('.ui-jqdialog-title').wrap('<div class="widget-header" />')
+                            style_search_form(form);
+                        },
+                        afterRedraw: function(){
+                            style_search_filters($(this));
+                        }
+                        ,
+                        multipleSearch: true,
+                        /**
+                         multipleGroup:true,
+                         showQuery: true
+                         */
+                    },
+                    {
+                        //view record form
+                        recreateForm: true,
+                        beforeShowForm: function(e){
+                            var form = $(e[0]);
+                            form.closest('.ui-jqdialog').find('.ui-jqdialog-title').wrap('<div class="widget-header" />')
+                        }
+                    }
+            )
+
+
+
+            function style_edit_form(form) {
+                //enable datepicker on "sdate" field and switches for "stock" field
+                form.find('input[name=sdate]').datepicker({format:'yyyy-mm-dd' , autoclose:true})
+                        .end().find('input[name=stock]')
+                        .addClass('ace ace-switch ace-switch-5').wrap('<label class="inline" />').after('<span class="lbl"></span>');
+
+                //update buttons classes
+                var buttons = form.next().find('.EditButton .fm-button');
+                buttons.addClass('btn btn-sm').find('[class*="-icon"]').remove();//ui-icon, s-icon
+                buttons.eq(0).addClass('btn-primary').prepend('<i class="icon-ok"></i>');
+                buttons.eq(1).prepend('<i class="icon-remove"></i>')
+
+                buttons = form.next().find('.navButton a');
+                buttons.find('.ui-icon').remove();
+                buttons.eq(0).append('<i class="icon-chevron-left"></i>');
+                buttons.eq(1).append('<i class="icon-chevron-right"></i>');
+            }
+
+            function style_delete_form(form) {
+                var buttons = form.next().find('.EditButton .fm-button');
+                buttons.addClass('btn btn-sm').find('[class*="-icon"]').remove();//ui-icon, s-icon
+                buttons.eq(0).addClass('btn-danger').prepend('<i class="icon-trash"></i>');
+                buttons.eq(1).prepend('<i class="icon-remove"></i>')
+            }
+
+            function style_search_filters(form) {
+                form.find('.delete-rule').val('X');
+                form.find('.add-rule').addClass('btn btn-xs btn-primary');
+                form.find('.add-group').addClass('btn btn-xs btn-success');
+                form.find('.delete-group').addClass('btn btn-xs btn-danger');
+            }
+            function style_search_form(form) {
+                var dialog = form.closest('.ui-jqdialog');
+                var buttons = dialog.find('.EditTable')
+                buttons.find('.EditButton a[id*="_reset"]').addClass('btn btn-sm btn-info').find('.ui-icon').attr('class', 'icon-retweet');
+                buttons.find('.EditButton a[id*="_query"]').addClass('btn btn-sm btn-inverse').find('.ui-icon').attr('class', 'icon-comment-alt');
+                buttons.find('.EditButton a[id*="_search"]').addClass('btn btn-sm btn-purple').find('.ui-icon').attr('class', 'icon-search');
+            }
+
+            function beforeDeleteCallback(e) {
+                var form = $(e[0]);
+                if(form.data('styled')) return false;
+
+                form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar').wrapInner('<div class="widget-header" />')
+                style_delete_form(form);
+
+                form.data('styled', true);
+            }
+
+            function beforeEditCallback(e) {
+                var form = $(e[0]);
+                form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar').wrapInner('<div class="widget-header" />')
+                style_edit_form(form);
+            }
+
+
+
+            //it causes some flicker when reloading or navigating grid
+            //it may be possible to have some custom formatter to do this as the grid is being created to prevent this
+            //or go back to default browser checkbox styles for the grid
+            function styleCheckbox(table) {
+                /**
+                 $(table).find('input:checkbox').addClass('ace')
+                 .wrap('<label />')
+                 .after('<span class="lbl align-top" />')
+
+
+                 $('.ui-jqgrid-labels th[id*="_cb"]:first-child')
+                 .find('input.cbox[type=checkbox]').addClass('ace')
+                 .wrap('<label />').after('<span class="lbl align-top" />');
+                 */
+            }
+
+
+            //unlike navButtons icons, action icons in rows seem to be hard-coded
+            //you can change them like this in here if you want
+            function updateActionIcons(table) {
+                /**
+                 var replacement =
+                 {
+                     'ui-icon-pencil' : 'icon-pencil blue',
+                     'ui-icon-trash' : 'icon-trash red',
+                     'ui-icon-disk' : 'icon-ok green',
+                     'ui-icon-cancel' : 'icon-remove red'
+                 };
+                 $(table).find('.ui-pg-div span.ui-icon').each(function(){
+				var icon = $(this);
+				var $class = $.trim(icon.attr('class').replace('ui-icon', ''));
+				if($class in replacement) icon.attr('class', 'ui-icon '+replacement[$class]);
+			})
+                 */
+            }
+
+            //replace icons with FontAwesome icons like above
+            function updatePagerIcons(table) {
+                var replacement =
+                {
+                    'ui-icon-seek-first' : 'icon-double-angle-left bigger-140',
+                    'ui-icon-seek-prev' : 'icon-angle-left bigger-140',
+                    'ui-icon-seek-next' : 'icon-angle-right bigger-140',
+                    'ui-icon-seek-end' : 'icon-double-angle-right bigger-140'
+                };
+                $('.ui-pg-table:not(.navtable) > tbody > tr > .ui-pg-button > .ui-icon').each(function(){
+                    var icon = $(this);
+                    var $class = $.trim(icon.attr('class').replace('ui-icon', ''));
+
+                    if($class in replacement) icon.attr('class', 'ui-icon '+replacement[$class]);
+                })
+            }
+
+            function enableTooltips(table) {
+                $('.navtable .ui-pg-button').tooltip({container:'body'});
+                $(table).find('.ui-pg-div').tooltip({container:'body'});
+            }
+
+            //var selr = jQuery(grid_selector).jqGrid('getGridParam','selrow');
+
+
+        });
+    </script>
+{% endblock %}

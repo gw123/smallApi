@@ -1,0 +1,13 @@
+.admin-table{
+    background-color: rgba(197, 211, 161, 0.6);
+    width: 100%;
+    min-width: 1000px;
+    margin-bottom: 15px;
+}
+.admin-table td{ padding: 5px;}
+.admin-table label { font-size: 13px;}
+.admin-table input { height: 30px; width: 120px;float: right}
+.admin-table select { width: 120px; height: 30px; float: right}
+.admin-table button { width: 120px;}
+.two-input { display: inline-block ;float: right}
+.two-input input {float: none}

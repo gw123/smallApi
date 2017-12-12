@@ -1,0 +1,80 @@
+<meta charset="utf-8">
+<div  id="htmlContent" style="width: 380px;height:600px;position: relative;background-color: #FFFFFF ">
+    <style>
+        *{font-size: 13px;}
+        h1 ,h2,h3,h4 ,.h1,.h2,.h3,.h4{margin: 0px; font-weight: 600}
+        h1 { font-size: 30px; } h2{ font-size: 20px } h3 { font-size: 18px } h4 { font-size: 15px }
+        .h1 { font-size: 30px; } .h2{ font-size: 20px } .h3 { font-size: 18px } .h4 { font-size: 15px }
+        hr{margin: 0px;padding: 0px;border-bottom-width: 2px;}
+        .col-3{ width: 30%; text-align: center;display: inline-block;}
+    </style>
+    <div style="height: 75px;">
+        <div style="position: absolute;top: 2px ;left:5px ">
+            <h1> 国内小包 </h1>
+            <h2>（代收货款）</h2>
+        </div>
+        <div style="position: absolute;top:4px;right: 10px;text-align: center">
+            <img src="assets/images/orderCode.png">
+            <h3 >{delivery_number}</h3>
+        </div>
+    </div>
+
+    <div  style="border-top: solid 2px #000;border-bottom: solid 2px #000;width: 100%">
+        <span class="h2 col-3">{receive_province}</span><span class="h2 col-3">{receive_city}</span><span class="h2 col-3">{receive_district}</span>
+    </div>
+    <div style="border-bottom: solid 2px #000;height: 100px">
+        <div style="height:100%; width: 32px;float: left;line-height: 35px;text-align: center;border-right: solid 2px;"><h3>收件 </h3>  </div>
+        <div style="padding-left: 50px;padding-top: 4px">
+            <div class="h4"> {receive_name}  1869090119  0999-222334 </div>
+            <div class="h4"> {receive_addr}</div>
+        </div>
+    </div>
+    <!---订单内容-->
+    <div style="width: 100%;height:130px;">
+        <div style="height:100%;position:relative;width: 56%; padding-left:5px;box-sizing:border-box;border-right:solid 2px #000; float: left">
+            订单号 ： {order_id}<br>
+            品名：   Rs-129 * 1<br>
+            <label  style="position: absolute;bottom: 4px;"> 重量（克）：345</label>
+        </div>
+        <div style="height:100%;position:relative;width: 56%;width:43%;float: left;padding-left: 10px;box-sizing: border-box ">
+            <h3 style="height: 50px;"> 收件人/代收人： </h3>
+            <h3> (代收款：xxx元)</h3>
+            <div style="position: absolute; bottom: 4px;">
+                <label > 签收时间：</label><br>
+                <label style="float: right">  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 年 &nbsp;&nbsp; 月 &nbsp;&nbsp;日 &nbsp;&nbsp; 时</label>
+            </div>
+        </div>
+        <div style="clear: both"></div>
+    </div>
+
+    <div style="width: 100%;border-top: dashed 2px #000">
+        <div style="float: left;text-align: center">
+            <img src="assets/images/orderCode.png">
+            <h3 >{delivery_number}</h3>
+        </div>
+        <img src="assets/images/orderCodeEms.png">
+        <div style="clear: both"></div>
+    </div>
+    <div style="border-bottom: solid 2px #000;border-top: solid 2px #000;height: 50px">
+        <div style="height:50px; width: 32px;float: left;line-height: 25px;text-align: center;border-right: solid 2px;"><h3>收件 </h3>  </div>
+        <div style="padding-left: 50px;padding-top: 4px">
+            {receive_name}  {receive_mobile}<br>
+            {receive_addr}
+        </div>
+    </div>
+
+    <div style="width:75% ;height: 100px;float: left">
+        <div style="height: 70px;">
+            <div style="height:70px; width: 32px;float: left;line-height: 25px;text-align: center;border-right: solid 2px;"><h3>寄件 </h3>  </div>
+            <div style="padding-left: 50px;padding-top: 4px">
+                知我药妆 电话：400-6301-018<br> 北京市顺义区铁匠营村斯派特物流园9号库
+            </div>
+        </div>
+        <div style="border-top: solid 2px #000;padding-left: 5px"> 订单号：{order_id}</div>
+        <div style="border-top: solid 2px #000;padding-left: 5px"> 网址:www.zhiwokeji.com 客服电话:11185</div>
+    </div>
+    <div style="height:120px;width: 23%;float: left;border-left: solid 2px #000;padding:10px 4px; box-sizing: border-box">
+        <img src="assets/images/orderErCode.png">
+    </div>
+
+</div>

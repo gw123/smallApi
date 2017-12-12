@@ -2,7 +2,7 @@
 
 /* 数据库配置 */
 $config =  array(
-        'param'=> require (ROOT_PATH.'/config/param.php'),
+        'params'=> require (ROOT_PATH.'/config/param.php'),
         'components'=>array(
             'caiji' => array(
                 'class'=> core\db\Mysql::class,
@@ -33,11 +33,9 @@ $config =  array(
                 'class'=>core\redis\RedisClient::class,
                 'host'=>'127.0.0.1',
                 'port'=>6379,
-                'auth'=>'gao123456'
+                //'auth'=>'gao123456'
             ],
-            'log'=>array(
-                'class'=> lib\Log::class,
-            ),
+
             'view'=> array(
                 'class'=> core\view\TwigView::class,
                 'cache'=>false,
