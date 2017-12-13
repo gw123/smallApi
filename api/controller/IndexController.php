@@ -16,7 +16,7 @@ class  IndexController extends Controller
         if($this->isAjax())
             echo "Ajax 请求".EOL."\n";
 
-        return $this->render('index');
+        //return $this->render('index');
     }
 
     public function   uploadAction()

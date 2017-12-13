@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ECharts</title>
+    <!-- 引入 echarts.js -->
+    <script src="/assets/js/echarts/echarts.common.min.js"></script>
+    <script src="/assets/js/util.js"></script>
+    <script src="/assets/js/jquery.min.js"></script>
+</head>
+<body>
+<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+<div id="main" style="width: 600px;height:400px;"></div>
+<button onclick="savaChart()"> 保存 </button>
+<script type="text/javascript">
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('main'));
+    //符号大小
+    var symbolSize = 10;
+
+    // 这个 data 变量在这里单独声明，在后面也会用到。
+    var data = [
+        [0, 120], [1, 10], [2, 20], [3, 2], [4, 2],[5,10],
+        [6,30],[7, 200], [8, 220], [9, 240], [10, 300], [11, 400],
+        [12,500],[13,500],[14, 520], [15, 610], [16, 520], [17, 402],
+        [18, 300],[19,310],[20,430],[21, 320], [22, 210], [23, 120]
+    ];
+
+    myChart.setOption({
+        yAxis: {
+            min: 0,
+            max: 600,
+            type: 'value',
+            axisLine: {onZero: false}
+        },
+        xAxis: {
+            min: 0,
+            max: 23,
+            type: 'value',
+            minInterval:6,
+            axisLine: {onZero: false}
+        },
+        series: [
+            {
+                id: 'a',
+                type: 'line',
+                smooth: true,
+                symbolSize: symbolSize, // 为了方便拖拽，把 symbolSize 尺寸设大了。
+                data: data
+            }
+        ]
+    });
+
+    myChart.setOption({
+        // 声明一个 graphic component，里面有若干个 type 为 'circle' 的 graphic elements。
+        // 这里使用了 echarts.util.map 这个帮助方法，其行为和 Array.prototype.map 一样，但是兼容 es5 以下的环境。
+        // 用 map 方法遍历 data 的每项，为每项生成一个圆点。
+        graphic: echarts.util.map(data, function (dataItem, dataIndex) {
+            return {
+                // 'circle' 表示这个 graphic element 的类型是圆点。
+                type: 'circle',
+
+                shape: {
+                    // 圆点的半径。
+                    r: symbolSize / 2
+                },
+                // 用 transform 的方式对圆点进行定位。position: [x, y] 表示将圆点平移到 [x, y] 位置。
+                // 这里使用了 convertToPixel 这个 API 来得到每个圆点的位置，下面介绍。
+                position: myChart.convertToPixel('grid', dataItem),
+
+                // 这个属性让圆点不可见（但是不影响他响应鼠标事件）。
+                invisible: true,
+                // 这个属性让圆点可以被拖拽。
+                draggable: true,
+                // 把 z 值设得比较大，表示这个圆点在最上方，能覆盖住已有的折线图的圆点。
+                z: 100,
+                // 此圆点的拖拽的响应事件，在拖拽过程中会不断被触发。下面介绍详情。
+                // 这里使用了 echarts.util.curry 这个帮助方法，意思是生成一个与 onPointDragging
+                // 功能一样的新的函数，只不过第一个参数永远为此时传入的 dataIndex 的值。
+                ondrag: echarts.util.curry(onPointDragging, dataIndex)
+            };
+        })
+    });
+
+    // 拖拽某个圆点的过程中会不断调用此函数。data 数组中的值会动态更新
+    // 此函数中会根据拖拽后的新位置，改变 data 中的值，并用新的 data 值，重绘折线图，从而使折线图同步于被拖拽的隐藏圆点。
+    function onPointDragging(dataIndex) {
+        // 这里的 data 就是本文最初的代码块中声明的 data，在这里会被更新。
+        // 这里的 this 就是被拖拽的圆点。this.position 就是圆点当前的位置。
+        // 添加限制 只在Y轴移动 2017-12-13
+        //console.log(data[dataIndex] ,myChart.convertFromPixel('grid', this.position))
+        var tmp =myChart.convertFromPixel('grid', this.position)
+        var newPosition = [data[dataIndex][0] ,tmp[1] ]
+        data[dataIndex] = newPosition
+        //data[dataIndex] = myChart.convertFromPixel('grid', this.position);
+        // 用更新后的 data，重绘折线图。
+        myChart.setOption({
+            series: [{
+                id: 'a',
+                data: data
+            }]
+        });
+        //console.log(data)
+    }
+    window.addEventListener('resize', function () {
+        // 对每个拖拽圆点重新计算位置，并用 setOption 更新。
+        myChart.setOption({
+            graphic: echarts.util.map(data, function (item, dataIndex) {
+                return {
+                    position: myChart.convertToPixel('grid', item)
+                };
+            })
+        });
+    });
+
+    function  savaChart()
+    {
+        var url = '/template/create';
+        var fromData = {}
+        fromData.content = data;
+        fromData.name = 100;
+        postJson(url,fromData,function(response){
+            console.log(response)
+        })
+    }
+
+</script>
+</body>
+</html>

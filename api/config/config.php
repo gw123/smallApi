@@ -14,13 +14,18 @@ $config =  array(
                 'encode'=>'utf8',//编码
             ),
             'db' => array(
-                'class'=> core\db\Mysql::class,
-                //数据库配置
-                'host'=>'127.0.0.1',    //服务器地址
-                'dbname' => 'edu', // 数据库名
-                'username' => 'root', // 用户名
-                'password' => 'root', // 密码
-                'encode'=>'utf8',//编码
+                 'class' => '\yii\db\Connection',
+                 'dsn' => 'mysql:host=xytschool.com;dbname=hpw',
+                 'username' => 'rwuser',
+                 'password' => 'gao4632',
+                 'charset' => 'utf8',
+            ),
+            'videoDb' => array(
+                'class' => '\yii\db\Connection',
+                'dsn' => 'mysql:host=xytschool.com;dbname=hpw',
+                'username' => 'rwuser',
+                'password' => 'gao4632',
+                'charset' => 'utf8',
             ),
 
             'view'=> array(
