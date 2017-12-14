@@ -1,0 +1,135 @@
+<html>
+<head>
+    <title> 网页调试器 </title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="在线调试器,nodejs"/>
+    <meta name="keywords" content="web开发技能学习"/>
+    <meta name="description" content="一款在线调试工具,访问 http://xytschool.com 获取更多信息" />
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/jquery.jsonview.min.css" />
+    <link rel="stylesheet" href="./css/debug.css" />
+    <script type="text/javascript" src="./js/jquery-2.1.4.js"></script>
+    <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="./js/jquery.jsonview.min.js"></script>
+    <script type="text/javascript" src="./js/tool.js"></script>
+<head>
+
+<body>
+<div class="container  _debug">
+    <div class="row">
+        <ul class="nav">
+            <li class="active">
+                <a href="#" id="btn_start" class="start" onclick="toggle_start_stop(this)">开始</a>
+            </li>
+            <li><a href="#" data-toggle="modal" data-target="#filter_modal">过滤</a></li>
+            <li><a href="#" data-toggle="modal" data-target="#setting_modal">设置</a></li>
+        </ul>
+    </div>
+    <div class="row">
+        <div class="col-xs-7"><small id="current_info"></small></div>
+        <div class="col-xs-5">
+            <div class="tip ws_status" style="font-size: 0.8em;text-align: right">...</div>
+        </div>
+    </div>
+
+    <div class="row">
+      <div id='logger' class="logger_container">
+
+      </div>
+    </div>
+
+    <!-- 模态框（设置） -->
+    <div class="modal fade" id="setting_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel"> 设置 </h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal" role="form">
+                        <div class="form-group">
+                            <label for="input_server_addr" class="col-sm-2 control-label">服务器地址</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="input_server_addr" value="debug.xyt">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="input_server_port" class="col-sm-2 control-label">端口</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="input_server_port" value="4000">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="input_token" class="col-sm-2 control-label">Token</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="input_token" placeholder="请输入验证token">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button onclick="toggle_connect(this)" class="start btn btn-default" data-dismiss="modal" aria-hidden="true" type="button">连接</button>
+                            </div>
+                        </div>
+                    </form>
+                </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+    <div id="" class="modal fade"  role="dialog">
+        <div  class="setting" style="display: none">
+            <div class="close" id="close_setting">X</div>
+
+        </div>
+    </div>
+</div>
+    <div class="modal fade" id="filter_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="modal_lable_falter"> 过滤设置 </h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal" role="form">
+                        <div class="form-group">
+                            <label for="input_filter_word" class="col-sm-2 control-label">过滤词</label>
+                            <div class="col-sm-10">
+                                <div class="row">
+                                    <div class="col-xs-10">
+                                        <input type="text" class="form-control" id="input_filter_word" placeholder="过滤短语">
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <input alt='点击启用' id='input_filter_word_flag' class="form-control" type="checkbox" >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="input_need_word" class="col-sm-2 control-label">包含词</label>
+                            <div class="col-sm-10">
+                                <div class="row">
+                                    <div class="col-xs-10">
+                                        <input type="text" class="form-control" id="input_need_word" placeholder="必须包涵短语">
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <input class="form-control" id='input_need_word_flag' type="checkbox" >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+    </div>
+
+</div>
+</body>
+<script type="text/javascript" src="js/debug.js"></script>
+</html>
+
+
