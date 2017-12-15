@@ -50,8 +50,8 @@ function initApp()
 
 initApp();
 
-//初始化http服务器
-require_once( CORE_PATH.'/entry.php');
+//初始化ws服务器
+require_once( CORE_PATH.'/wsEntry.php');
 
 
 
