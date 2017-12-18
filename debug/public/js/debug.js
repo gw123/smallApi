@@ -61,7 +61,9 @@ function  Chat(server,callback) {
 
     this.ws = null;
     //初始化 -- 握手成功后发送令牌数据
-    this.connect = function () {
+    this.connect = function ()
+    {
+        console.log(this.server)
         this.ws = new WebSocket(this.server);
         _this =this;
         this.ws.onopen = function(){

@@ -6,6 +6,7 @@ use core\base\BaseCookie;
 class WsCookie extends BaseCookie{
 
     public $data = [];
+
     public function __construct($data)
     {
         $this->data = $data;
@@ -25,14 +26,23 @@ class WsCookie extends BaseCookie{
      * @param $key
      * @return mix
      */
-    public function getCookie($key)
+    public function getCookie($key=null)
     {
+        if(empty($key)) {
+            return $this->data;
+        }
         if(!isset($this->data[$key])) {
             return false;
         }
-
         return $this->data[$key];
     }
 
+    public function getSessionId()
+    {
+        if(isset($this->data['session_id'])) {
+            return $this->data['session_id'];
+        }
+        return null;
+    }
 
 }

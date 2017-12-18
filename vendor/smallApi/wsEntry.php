@@ -37,11 +37,7 @@ $server->on('open', function($server, $req) use($client_user_list) {
 });
 
 $server->on('message', function($server, $frame) {
-    echo "received message: {$frame->data}\n";
-    $pathinfo= $frame->data->path_info;
-    $map = \core\Router::parseRouter($pathinfo);
-    $response = parseFrame($frame->data);
-    $server->push($frame->fd, json_encode($response));
+    ALL::dispatchWs($frame,$server);
 });
 
 $server->on('close', function($server, $fd) {
@@ -51,25 +47,3 @@ $server->on('close', function($server, $fd) {
 $server->start();
 
 
-function parseFrame($frame)
-{
-    switch($frame->path_info){
-        case 'path_info' :
-           $response =  parseTokenFrame($frame);
-            break;
-        case 'msg' :
-           $response =  parseMsgFrame($frame);
-           break;
-    }
-    return $response;
-}
-
-function parseTokenFrame($frame)
-{
-
-}
-
-function parseMsgFrame($frame)
-{
-
-}

@@ -8,9 +8,10 @@ class  Router {
     public static function parseRouter( $path_info )
     {
         $url = $path_info;
+        \Log::info('pathinfo: '.$url);
         $url = str_replace('\\','/',$url);
         //去掉入口php文件
-        $url = str_replace( substr(ENTRY_FILENAME,strrpos(ENTRY_FILENAME,'/'),'',$url) );
+        $url = str_replace( substr(ENTRY_FILENAME,strrpos(ENTRY_FILENAME,'/')),'',$url );
 
         if( strpos($url,'?') )
             $url = substr( $url , 0, strpos($url , '?'));

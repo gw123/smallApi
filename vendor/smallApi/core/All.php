@@ -1,4 +1,5 @@
 <?php
+use core\exceptions\InvalidConfigException;
 
 /***
  * 全局应用 所有请求共用类
@@ -11,7 +12,7 @@ class All{
     /***
      * @var \core\App;
      */
-    public  static $ap
+    public  static $app;
     /***
      * @var \core\Container
      */
@@ -84,6 +85,8 @@ class All{
 
     /***
      * 调度路由
+     * @param $request
+     * @param $response
      * @return bool
      */
     public static function dispatch(&$request , &$response)
@@ -131,52 +134,71 @@ class All{
 
     /***
      * 调度路由
+     * @param $frame
+     * @param $server
      * @return bool
      */
     public static function dispatchWs(&$frame,&$server)
     {
-        //Log::info( 'dispatch');
-        $routeMap = \core\Router::parseRouter($frame->data->path_info);
+        $requestData = $frame->data;
+        if(!($requestData = json_decode($requestData,true))) {
+            $requestData = null;
+        }
+        //var_dump($requestData);
+        if(!isset($requestData['pathinfo'])) {
+            $pathinfo = '/index/index';
+        }else {
+            $pathinfo = $requestData['pathinfo'];
+        }
+        //echo 'pathinfo:'.$pathinfo."\n";
+        $routeMap = \core\Router::parseRouter($pathinfo);
+        $response = new \core\WsResponse($server,$frame->fd);
+        if(isset($requestData['cookie'])) {
+              $cookie_data = $requestData['cookie'];
+        } else {
+              $cookie_data = ['session_id'=>''];
+        }
+        $cookie  = new \core\WsCookie($cookie_data);
+        $response->setCookie($cookie->getCookie());
 
-        if( !$routeMap ){
-            $response = [
+        if(!$routeMap ) {
+             $responseData = [
                 'status'=>404,
-                'msg'=>'访问内容存在'
-            ];
-            $server->push($frame->fd, json_encode($response));
+                'msg'=>'访问内容不存在'
+             ];
+            $response->output($responseData);
             return;
         }
 
         $controller = $routeMap[0];
         $action = $routeMap[1];
         $controllerFile = APP_PATH."/controller/".$controller."Controller".".php";
-
-        // Log::info($request->header);
-
-        if(!is_file($controllerFile))
-        {
+        if(!is_file($controllerFile)) {
             \All::waring("Controller :: $controllerFile  not exist !" ,__FILE__,__LINE__);
             return false;
         }
         /**注意反斜杠转义的问题*/
         $controllerStr = APP_ROOT_NAMESPACE.'\\'.'controller\\'.$controller."Controller";
 
-        $request    = new core\Request($request,$response);
+        //var_dump('cookie_data:',$cookie_data);
+        $session = new \core\WsSession($cookie->getSessionId());
+        //更新session_id
+        $cookie->setCookie('session_id' ,$session->session_id);
+        $request = new \core\WsRequest($server);
         $request->_action = $action;
         $request->_controller = $controller;
 
-        $controller = new $controllerStr( $request );
 
+        $controller = new $controllerStr($request ,$response,$session,$cookie );
         $action   = $action."Action";
-
         if(!method_exists($controller,$action))
         {
             \All::waring("function:: {$controllerStr}->{$action}  not exist !" ,__FILE__,__LINE__);
             return false;
         }
         $result = $controller->$action( );
-        $response->end($result);
-
+        $response->setCookie($cookie->getCookie());
+        $response->output($result);
     }
 
     public static function waring($msg)
