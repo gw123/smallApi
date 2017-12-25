@@ -15,11 +15,8 @@ define( 'SESSION_ID_PRE','SESSION_');
 
 define( 'CORE_PATH' , VENDOR_PATH.'/smallApi' );
 //
-require_once( APP_PATH.'/logger.php' );
-
 require( CORE_PATH.'/core/All.php');
-require( CORE_PATH.'/core/Request.php');
-require( CORE_PATH.'/core/Yii.php');
+
 /***
  * 初始化框架
  */
@@ -37,14 +34,14 @@ function initApp()
     #spl autoload  类的查找顺序应该是 先从后面注册的加载函数开始
     set_exception_handler(array(All::class , 'exceptionHandel'));
 
-    // 下面两句顺序不能颠倒
-    All::$container = new  \core\Container();
-    $commonConfig   = require ( ROOT_PATH."/config/config.php" );    #var_dump($config);
-    $appConfig      = require ( APP_PATH."/config/config.php" );
+    $commonConfig   = require_once ( ROOT_PATH."/config/config.php" );    #var_dump($config);
+    $appConfig      = require_once ( APP_PATH."/config/config.php" );
     //\Log::info($commonConfig);
     //\Log::info($appConfig);
     $config['components']  = array_merge( $commonConfig['components'] , $appConfig['components']);
     $config['params']  = array_merge( $commonConfig['params'] , $appConfig['params']);
+    // 下面两句顺序不能颠倒
+    All::$container = new  \core\Container();
     All::$app       =  new core\App($config);
 }
 

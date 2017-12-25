@@ -30,7 +30,7 @@ function getPid($place)
 }
 //getPid('entry');
 #监听地址 0.0.0.0 是全部地址
-$http = new swoole_http_server("0.0.0.0", 82);
+$http = new swoole_http_server($httpServerConf['bind_addr'], $httpServerConf['port']);
 
 #swoole配置
 $http->set(array(
@@ -54,8 +54,6 @@ $http->set(array(
 ));
 
 #redis
-
-
 #初始化全局缓冲（分类，user基本信息） 可以通过 redis ， memcache ， 共享内存实现
 $http->on("start", function ($server) {
 	global $httpServerConf;
@@ -82,14 +80,11 @@ $http->on('WorkerStop', function ($serv, $worker_id){
     $str = "进程结束 销毁内存\n";
     getPid($str);
 });
-//$session_table = new swoole_table(100000);
-
 
 /***
  *
  */
 $http->on("request", function ($request, $response) {
-
     // getPid('http on request Count:'.$count." ");
     \All::dispatch($request,$response);
 });

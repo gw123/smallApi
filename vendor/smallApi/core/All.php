@@ -1,6 +1,7 @@
 <?php
 use core\exceptions\InvalidConfigException;
-
+//依赖 Yii框架的 MODEL
+require_once( CORE_PATH.'/core/Yii.php');
 /***
  * 全局应用 所有请求共用类
  * Class BaseApp
