@@ -7,7 +7,7 @@ $config =  array(
                  'class' => '\yii\db\Connection',
                  'dsn' => 'mysql:host=xytschool.com;dbname=hpw',
                  'username' => 'rwuser',
-                 'password' => 'gao123456!',
+                 'password' => 'gao4632',
                  'charset' => 'utf8',
             ),
             'videoDb' => array(

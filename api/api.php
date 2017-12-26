@@ -19,7 +19,7 @@ require_once( APP_PATH.'/logger.php' );
 
 require( CORE_PATH.'/core/All.php');
 require( CORE_PATH.'/core/Request.php');
-require( CORE_PATH.'/core/Yii.php');
+
 /***
  * 初始化框架
  */

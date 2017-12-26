@@ -1,7 +1,8 @@
 {
     "name": "gw/small-api",
     "require": {
-        "twig/twig": "~1.24.0"
+        "twig/twig": "~1.24.0",
+        "phpmailer/phpmailer": "*"
     },
     "repositories": {
         "packagist": {

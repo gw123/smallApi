@@ -1,6 +1,5 @@
 <?php
 
-
 class  Log{
     //调试服务器地址
     public  static  $serverURL='http://www.xytschool.com:8080';
