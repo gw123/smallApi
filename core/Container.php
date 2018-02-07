@@ -2,6 +2,7 @@
 namespace core;
 use ReflectionClass;
 use core\exceptions\InvalidConfigException;
+use yii\di\NotInstantiableException;
 
 
 class Container{
@@ -87,11 +88,11 @@ class Container{
     {
         /* @var $reflection ReflectionClass */
         list ($reflection, $dependencies) = $this->getDependencies($class);
-        //var_dump($this->_dependencies);
+
         foreach ($params as $index => $param) {
             $dependencies[$index] = $param;
         }
-        //var_dump($dependencies);
+
         $dependencies = $this->resolveDependencies($dependencies, $reflection);
         //var_dump($dependencies);
         if (!$reflection->isInstantiable()) {
@@ -102,9 +103,15 @@ class Container{
         }
 
         $object = $reflection->newInstanceArgs($dependencies);
+
         foreach ($config as $name => $value) {
             $object->$name = $value;
         }
+
+        ///执行配置后函数 完成连接数据库 等操作
+        if(method_exists($object,'afterConfigure'))
+            $object->afterConfigure();
+
         return $object;
 
     }

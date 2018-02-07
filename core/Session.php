@@ -5,48 +5,51 @@ namespace core;
  */
 class Session{
 
-    public static $session_start = false;
     /**
-     * 设置session
-     * @param String $name   session name
-     * @param Mixed  $data   session data
-     * @param Int    $expire 超时时间(秒)
+     * 模拟实现session 机制
      */
-    public static function set($name, $data, $expire=600){
-        if(!static::$session_start)
+    public  function  session_start(  )
+    {
+        if( !empty($this->request->cookie) && isset( $this->request->cookie['SMALLAPI_SES'] ) )
         {
-            static::$session_start =true;
-            //$ini_set =ini_get('session.auto_start');
-            session_start();
+            $sessionId = $this->request->cookie[ SESSION_COOKIE_NAME ];
+        }else{
+            $sessionId = $this->makeSessionId();
+            #http_response->cookie(string $key, string $value = '', int $expire = 0 , string $path = '/', string $domain  = '', bool $secure = false , bool $httponly = false);
+            $this->response->cookie( SESSION_COOKIE_NAME, $sessionId );
         }
-        $_SESSION[$name] = $data;
-    }
 
-    /**
-     * 读取session
-     * @param  String $name  session name
-     * @return Mixed
-     */
-    public static function get($name){
-        if(!static::$session_start)
+        $this->_session = $this->redis->hGetAll($sessionId);
+        if( empty($this->_session) )
         {
-            static::$session_start =true;
-            //$ini_set =ini_get('session.auto_start');
-            session_start();
+            $this->redis->hSet( $sessionId  ,'id' , $sessionId );
+        }else{
+            $this->_session = [];
         }
-        if(isset($_SESSION[$name])){
-            return $_SESSION[$name];
-        }
-        return false;
+        //echo $sessionId."\n";
+        $this->_session_id = $sessionId;
     }
-
-    /**
-     * 清除session
-     * @param  String  $name  session name
+    /***
+     * 生成sessionID
+     * @return string
      */
-    private static function clear($name){
-        unset($_SESSION[$name]);
+    private  function makeSessionId()
+    {
+        $time =  microtime();
+        $rand = rand(0,10000000);
+        return SESSION_ID_PRE.md5($time.$rand);
     }
 
+    public  function setSession($key ,$value)
+    {
+        if(!empty($this->_session_id))
+            $this->redis->hSet( $this->_session_id  ,$key , $value );
+    }
+
+    public  function  getSession($key)
+    {
+        if( !empty($this->_session_id) )
+            return $this->redis->hGet( $this->_session_id ,$key);
+    }
 }
 ?>

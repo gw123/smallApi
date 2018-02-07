@@ -1,11 +1,12 @@
 <?php
 namespace  core;
-use core\All;
+use \All;
 use  core\Container;
 use core\exceptions\InvalidConfigException;
 
 /***
- * @property \core\db\Mysql $db The database connection. This property is read-only.
+ * @property \yii\db\Connection $db The database connection. This property is read-only.
+ * @property \core\redis\RedisClient $redis The database connection. This property is read-only.
  * @property \core\view $view The database connection. This property is read-only.
  * @property \lib\Log $log The database connection. This property is read-only.
  * @package core
@@ -22,19 +23,16 @@ class App extends Component{
     private $_definitions = [];
 
      //App参数
-     public    $param = array();
+     public    $params = array();
 
      public function __construct(array  $config)
      {
-         if(isset($config['components']))
-          $this->setComponents($config['components']);
-//          $this->db = $this->get('db');
-//          $this->view =$this->get('view');
-//          $this->log = $this->get('log');
-//         $this->db      =  new  \core\db\Mysql($this->config['db']);
-//         $this->db_ecstore = new  \core\db\Mysql($this->config['ecstore']);
-//         $this->log     =  new  \lib\Log();
-//         $this->param   =  $config['param'];
+         if(isset($config['components'])){
+             $this->setComponents($config['components']);
+         }
+         if(isset($config['params'])){
+             $this->params = $config['params'];
+         }
      }
 
      public  function run()
@@ -42,7 +40,7 @@ class App extends Component{
          \core\Router::run();
      }
 
-     public   function getConfig(string $key)
+     public   function getConfig( $key)
      {
          if(isset($this->config[$key]))
          {
@@ -62,6 +60,7 @@ class App extends Component{
             if (is_object($definition) && !$definition instanceof Closure) {
                 return $this->_components[$id] = $definition;
             } else {
+
                 return $this->_components[$id] = All::createObject($definition);
             }
         } elseif ($throwException) {

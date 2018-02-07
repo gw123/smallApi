@@ -1,0 +1,22 @@
+{
+    "name": "smallApi",
+    "type": "library",
+    "description": "simple and fast api base on swoole",
+    "keywords": ["smallApi", "fast", "swoole", "task"],
+    "homepage": "https://github.com/gw123/smallApi",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "gw123",
+            "email": "963353840@qq.com",
+            "homepage": "http://xytschool.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.0.0"
+    },
+    "autoload": {
+        "psr-4": {"core\\": "core"},
+		"psr-4": {"lib\\": "lib"}
+    }
+}
