@@ -1,5 +1,4 @@
 {
-<<<<<<< HEAD
     "name": "smallApi",
     "type": "library",
     "description": "simple and fast api base on swoole",
@@ -19,18 +18,4 @@
     "autoload": {
         "psr-4": {"core\\": "core"}
     }
-=======
-    "name": "gw/small-api",
-    "require": {
-        "twig/twig": "~1.24.0",
-        "phpmailer/phpmailer": "*"
-    },
-    "repositories": {
-        "packagist": {
-            "type": "composer",
-            "url": "https://packagist.phpcomposer.com"
-        }
-    }
-
->>>>>>> d5a813913fc9a8d0c3ade4d4d09edf3755f0ca52
 }
