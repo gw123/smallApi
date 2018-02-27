@@ -1,0 +1,94 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          smallApi
+# Required-Start:    $remote_fs $network
+# Required-Stop:     $remote_fs $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: starts smallApi
+### END INIT INFO
+
+prefix=/data/wwwroot/smallApi
+php_bin=/data/install/php/bin/php
+app_entry=${prefix}/api/api.php
+app_pid_file=/var/run/swoole.pid
+
+#echo ${app_entry}
+
+case "$1" in 
+	start)
+		echo -n "Starting smallApi "
+		$php_bin $app_entry
+		if [ "$?" != 0 ] ; then
+                        echo " failed"
+                        exit 1
+                fi
+
+		
+		echo "  done";
+	;;
+	stop)
+		echo -n "Stop smallApi"
+		
+		if [ ! -r $app_pid_file ] ; then
+			echo "waring not found Pid File :{$app_pid_file} "
+			exit 1
+		fi
+		echo $app_pid_file		
+		kill -TERM `cat $app_pid_file`
+		if [ "$?" != 0 ] ; then
+			echo "  failed"
+			exit 1
+		fi
+	
+		echo "  done"		
+	;;
+	reload)
+		echo -n "Reload smallApi"
+		if [ ! -r $app_pid_file ] ; then
+			echo "waring not found Pid File :{$app_pid_file} "
+			exit 1
+		fi
+
+		kill -USR2 `cat $app_pid_file`
+		if [ "$?" != 0 ] ; then
+			echo "  failed"
+			exit 1
+		fi
+		echo "  done"	
+	;;
+	restart)
+		$0 stop
+		$0 start
+	;;
+	check)
+		if [ ! -r $app_pid_file ] ; then
+			$0 start
+			ulimit -c unlimited
+			echo "重新启动."
+                        exit 0
+                fi
+
+		pid=`cat $app_pid_file |sed 'N;s/\n/ /'`
+		ps -eaf | grep $app_entry | grep $pid
+		count=`ps -eaf | grep $app_entry | grep -v "grep" | grep $pid |wc -l`
+		if [ $count -lt 1 ] ; then
+			ps -eaf | grep $app_entry|grep -v 'grep' | awk -F" " '{ print $2}' |xargs kill -9
+			ulimit -c unlimited
+			echo "重新启动.."
+			$0 start
+		fi
+
+	;;
+	fstop)
+		#强制杀死所有的进程
+		count=`ps -eaf | grep $app_entry | grep -v "grep" |wc -l`
+                if [ $count -ge 1 ] ; then
+			ps -eaf | grep $app_entry|grep -v 'grep' | awk -F" " '{ print $2}' |xargs kill -9
+		fi
+	;;
+	*)
+		echo "start|stop|restart|check"
+	;;
+esac		
+
