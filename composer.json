@@ -1,5 +1,5 @@
 {
-    "name": "smallApi",
+    "name": "small-api",
     "type": "library",
     "description": "simple and fast api base on swoole",
     "keywords": ["smallApi", "fast", "swoole", "task"],
