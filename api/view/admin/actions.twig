@@ -1,0 +1,212 @@
+{% extends "/layout/homeLayout.twig" %}
+
+{% block pageAssert %}
+    <link rel="stylesheet" href="/assets/css/jquery-ui-1.10.3.full.min.css" />
+    <link rel="stylesheet" href="/assets/css/datepicker.css" />
+    <link rel="stylesheet" href="/assets/css/ui.jqgrid.css" />
+    <style>
+        .ztree li span.button.add {margin-left:2px; margin-right: -1px; background-position:-144px 0;  vertical-align:top; *vertical-align:middle}
+        .left-top-panel{ height: 10%; }
+        ul.ztree { background:transparent;width:100%; height: 600px;  overflow-y:auto;overflow-x:auto;}
+    </style>
+{% endblock %}
+
+{% block content %}
+    {% if msg %}
+    <div class="alert alert-block alert-waring">
+        <button type="button" class="close" data-dismiss="alert">
+            <i class="icon-remove"></i>
+        </button>
+        <i class="icon-ok green"></i>
+        <strong class="green">
+            {{ msg }}
+        </strong>
+    </div>
+    {% endif %}
+
+    <div class="row panel">
+        <div class="col-md-5">
+            <ul id="treeBlock" class="ztree"></ul>
+        </div>
+        <div class="col-md-7">
+            <form id="actionForm" action="" method="post">
+                <table class="table table-responsive table-bordered">
+                    <caption> <h4> 当前选择动作</h4></caption>
+                    <input type="hidden" name="id">
+                    <tr> <td width="50%">动作名称</td> <td> <input name="scopes_name" placeholder=""></td></tr>
+                    <tr> <td>动作路由</td> <td> <input name="scopes_value" placeholder=""></td></tr>
+                    <tr> <td></td>
+                         <td> <input  type="submit" value="修改"></td></tr>
+                </table>
+            </form>
+            <hr>
+            <form id="newActionForm" action="" method="post" >
+                <table class="table table-responsive table-bordered">
+                    <caption> <h4> 添加新动作 父动作：<span> --</span></h4></caption>
+                    <input type="hidden" name="parent_id">
+                    <input type="hidden" name="parent_name">
+                    <tr> <td width="50%">动作名称</td> <td> <input name="scopes_name" placeholder=""></td></tr>
+                    <tr> <td>动作路由</td> <td> <input name="scopes_value" placeholder=""></td></tr>
+                    <tr><td colspan="1"> <input  type="button" value="添加到当前选择节点" onclick="addChildNode()"></td>
+                        <td colspan="1"> <input  type="submit" value="添加到根节点"></td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block script %}
+    <link rel="stylesheet" href="/assets/js/tree/css/zTreeStyle/zTreeStyle.css" type="text/css">
+    <script type="text/javascript" src="/assets/js/tree/js/jquery.ztree.core.js"></script>
+    <script type="text/javascript" src="/assets/js/tree/js/jquery.ztree.excheck.js"></script>
+    <script type="text/javascript" src="/assets/js/tree/js/jquery.ztree.exedit.js"></script>
+    <script>
+        /***************************** 树型菜单部分************************/
+        var   treeData = {{ tree| json_encode|raw }}
+        var zNodes =[];
+        var _currentTreeNode = null;
+        var _currentHoverTreeNode = null;
+        var currentChapterId = 0;
+        var chapterTree= null;
+        var setting = {
+            view: {
+                showLine: false,
+                addHoverDom: addHoverDom,
+                removeHoverDom: removeHoverDom,
+                selectedMulti: false
+            },
+            edit: {
+                enable: true,
+                showRemoveBtn: false,
+                showRenameBtn: false,
+                //removeTitle:'删除',
+                //renameTitle:'重命名'
+            },
+            data: {
+                simpleData: {
+                    enable: true
+                }
+            },
+            callback: {
+                onClick: zTreeOnClick,
+                //onDrag: zTreeOnDrag,
+                onDrop: zTreeOnDrop
+                //beforeEditName: beforeEditName,
+                //beforeDrag: beforeDrag,
+                //beforeDrop: beforeDrop
+            }
+        };
+
+        chapterTree = $.fn.zTree.init($("#treeBlock"), setting , treeData);
+
+        function zTreeOnClick(event,treeid,treeNode,clikFlag) {
+            _currentTreeNode = treeNode
+            console.log(_currentTreeNode);
+            $('#actionForm [name="scopes_name"]').val(_currentTreeNode.name);
+            $('#actionForm [name="id"]').val(_currentTreeNode.id);
+            $('#actionForm [name="scopes_value"]').val(_currentTreeNode.scopes_value);
+
+        }
+        
+        function beforeDrag(treeId, treeNodes) {
+            for (var i=0,l=treeNodes.length; i<l; i++) {
+                if (treeNodes[i].drag === false) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        function beforeDrop(treeId, treeNodes, targetNode, moveType) {
+            return targetNode ? targetNode.drop !== false : true;
+        }
+
+        function zTreeOnDrop(event, treeId, treeNodes, targetNode, moveType) {
+
+            for(var index in treeNodes)
+            {
+                var moveNode = treeNodes[index];
+                var parentNode = targetNode;
+                if( !parentNode )  { continue;}
+
+                var param = {id:moveNode.id ,parentId:parentNode.id };
+            }
+        };
+
+        function addHoverDom(treeId, treeNode) {
+            //console.log('addHover')
+            _currentHoverTreeNode = treeNode;
+            var sObj = $("#" + treeNode.tId + "_span");
+            if (treeNode.editNameFlag || $("#addBtn_"+treeNode.tId).length>0) return;
+            var addStr = "<span class='button add' id='addBtn_" + treeNode.tId
+                    + "' title='add node' onfocus='this.blur();'></span>";
+            sObj.after(addStr);
+
+            var btn = $("#addBtn_"+treeNode.tId);
+            if (!btn)  { alert('domError:'+btn); return;}
+
+            // 添加新节点
+            btn.bind("click", function(){
+                if(!_currentHoverTreeNode) $.waring("请单击父节点");
+                var data ={ name:'newNode',parentid:_currentHoverTreeNode.id,
+                    root: _currentHoverTreeNode.root,
+                    parents:_currentHoverTreeNode.parents};
+
+                console.log(data);
+
+                ChapterService.createChapterNode(function (response) {
+                    if(response.status==1)
+                    {
+                        data.id = response.data.id;
+                        data.parents = response.data.parents;
+                        //console.log(data);
+                        chapterTree.addNodes(treeNode, data );
+                    }
+                    return false;
+                },data);
+            });
+
+        };
+        function removeHoverDom(treeId, treeNode) {
+            $("#addBtn_"+treeNode.tId).unbind().remove();
+        };
+
+        //更新节点
+        function btn_save() {
+            //console.log(_currentTreeNode);
+            if(!_currentTreeNode) { errorTip('请选择节点!!'); return ;}
+            var name = $('[name="item_name"]').val();
+            console.log(name);
+            ChapterService.updateNode(function (response) {
+                if(response.status) {
+                    _currentTreeNode.name = name;
+                    chapterTree.updateNode(_currentTreeNode);
+                    layer.msg('更新成功');
+                }
+                else{ alert(response.msg); }
+            } ,{id:_currentTreeNode.id ,title:name} );
+        }
+
+        //删除
+        function btn_del() {
+            var data ={id:_currentTreeNode.id, root:_currentTreeNode.root };
+            TagService.deleteTagNode(function (response) {
+                console.log(response);
+                if(response.status=="1")
+                {
+                    succesTip();
+                    chapterTree.removeNode(_currentTreeNode);
+                }else{
+                    errorTip();
+                }
+            },data);
+        }
+        
+        function addChildNode() {
+            $('#newActionForm [name="parent_id"]').val( $('#actionForm [name="id"]').val());
+            $('#newActionForm [name="parent_name"]').val( $('#actionForm [name="scopes_name"]').val());
+            $('#newActionForm').submit();
+        }
+    </script>
+{% endblock %}

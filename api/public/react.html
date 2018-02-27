@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Hello React!</title>
+
+    <link rel="stylesheet" href="assets/css/font-awesome.min.css" />
+    <script src="https://cdn.bootcss.com/react/15.4.2/react.min.js"></script>
+    <script src="https://cdn.bootcss.com/react/15.4.2/react-dom.min.js"></script>
+    <script src="https://cdn.bootcss.com/babel-standalone/6.22.1/babel.min.js"></script>
+
+
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<div class="tpl">
+<div id="React_assignDeliveryModal"></div>
+<div id="Tpl_assignDeliveryModal" class="tpl">
+    <button class="btn" id="model" data-toggle="modal" data-target="#assignDeliveryModal"> 模态框 </button>
+    <div class="modal fade" id="assignDeliveryModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="width: 800px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        订单分配物流
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div >
+                            <select id="deliveryChannelSelect" ></select>
+                            <button class="btn btn-sm  btn-primary" onclick="Zhiwo.Shipping.assignDelivery()">分配</button>
+                        </div>
+                        <form id="deliveryOrderIdsFrom">
+                            <table class="table table-responsive">
+                                <tr>
+                                    <td> 订单号 </td>    <td> 00909099999 </td>
+                                    <td> 物流公司 </td>  <td> 盛经济界解决 </td>
+                                    <td> 物流单号 </td>  <td> 823791023920 </td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="Zhiwo.Shipping.printDelivery()">
+                        打印订单
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+</div>
+</div>
+
+<script type="text/babel">
+
+    function getTpl(id) {
+        return document.getElementById(id).innerHTML;
+    }
+
+    var Tpl_assignDeliveryModal = React.createClass({
+        render: function() {
+            return(
+                    <div class="tpl">
+                        <div id="React_assignDeliveryModal"></div>
+                        <div id="Tpl_assignDeliveryModal" class="tpl">
+                            <button class="btn" id="model" data-toggle="modal" data-target="#assignDeliveryModal"> 模态框 </button>
+                            <div class="modal fade" id="assignDeliveryModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" >
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">2</button>
+                                            <h4 class="modal-title" id="myModalLabel">订单分配物流</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div >
+                                                    <select id="deliveryChannelSelect" ></select>
+                                                    <button class="btn btn-sm  btn-primary" onclick="Zhiwo.Shipping.assignDelivery()">分配</button>
+                                                </div>
+                                                <form id="deliveryOrderIdsFrom">
+                                                    <table class="table table-responsive">
+                                                        <tr>
+                                                            <td> 订单号 </td>    <td> 00909099999 </td>
+                                                            <td> 物流公司 </td>  <td> 盛经济界解决 </td>
+                                                            <td> 物流单号 </td>  <td> 823791023920 </td>
+                                                        </tr>
+                                                    </table>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                                            </button>
+                                            <button type="button" class="btn btn-primary" onclick="Zhiwo.Shipping.printDelivery()">打印订单</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            );
+        }
+    });
+    ReactDOM.render(
+            <Tpl_assignDeliveryModal  />,
+            document.getElementById('React_assignDeliveryModal')
+    );
+
+
+
+
+</script>
+</body>
+</html>
