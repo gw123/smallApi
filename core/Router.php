@@ -12,12 +12,12 @@ class  Router {
         //去掉入口php文件
         $url = str_replace( substr(ENTRY_FILENAME,strrpos(ENTRY_FILENAME,'/')),'',$url );
 
-        if( strpos($url,'?') )
+        if( strpos($url,'?') ){
             $url = substr( $url , 0, strpos($url , '?'));
+        }
 
         // 优先静态路由
-        if( array_key_exists($url , \ALL::$routers ) )
-        {
+        if( array_key_exists($url , \ALL::$routers ) ) {
             $url = \ALL::$routers[$url];
         }
 
@@ -27,7 +27,7 @@ class  Router {
         $controller = isset($tempPath[0])&&!empty($tempPath[0]) ? $tempPath[0] :'Index';
         $action = isset($tempPath[1])&&!empty($tempPath[1]) ? $tempPath[1] :'Index';
         $controller = ucfirst($controller);
-        $action = ucfirst($action);
+        //$action = ucfirst($action);
 
         return [$controller,$action];
     }

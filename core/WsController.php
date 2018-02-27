@@ -1,9 +1,7 @@
 <?php
 namespace  core;
 
-use core\base\BaseController;
-
-class   WsController extends BaseController {
+class   WsController extends Container {
     /***
      *@var  WsRequest;
 
@@ -11,23 +9,14 @@ class   WsController extends BaseController {
     public  $request;
 
     /***
-     *@var  WsCookie;
-     */
-    public  $cookie;
-
-    /***
-     *@var  WsSession;
-     */
-    public  $session;
-
-    /***
      *@var  WsResponse;
      */
     public  $response;
 
-    public  function  __construct( $request,$response,$session,$cookie  )
+    public  function  __construct( $request,$response  )
     {
-        parent::__construct($request,$response,$session,$cookie);
+        $this->request = $request;
+        $this->response = $response;
     }
 
     public  function  asJson($data)
@@ -36,10 +25,19 @@ class   WsController extends BaseController {
     }
 
 
-    public function error($msg ,$timeout=2 ,$status = 0 ,$viewTpl = "/site/error")
-    {
 
+    public  function  success($data,$msg='')
+    {
+        $this->header( 'Content-type','application/json' );
+        return json_encode(['code'=>Code::OK,'data'=>$data,'msg'=>$msg]);
     }
+
+    public  function  fail($code = Code::SysError,$msg='')
+    {
+        $this->header( 'Content-type','application/json' );
+        return json_encode(['code'=>$code,'msg'=>$msg]);
+    }
+
 
     /**
      * @param $filePath
@@ -48,7 +46,7 @@ class   WsController extends BaseController {
     public function  render($filePath ='',$data = array() )
     {
         //设置编码
-        $this->setUtf8();
+
         if(empty($filePath)) $filePath = $this->request->_action;
 
         if($filePath[0]=='/')

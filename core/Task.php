@@ -16,13 +16,16 @@ abstract  class  Task {
         $this->work_id = $work_id;
         $this->data = $data;
     }
+
     function getErrors()
     {
         return $this->errors;
     }
+
     function beforeRun(){
         return true;
     }
+
     abstract function run();
 
 

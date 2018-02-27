@@ -1,5 +1,5 @@
 {
-    "name": "gw123/small-api",
+    "name": "smallApi",
     "type": "library",
     "description": "simple and fast api base on swoole",
     "keywords": ["smallApi", "fast", "swoole", "task"],
@@ -16,7 +16,6 @@
         "php": ">=7.0.0"
     },
     "autoload": {
-        "psr-4": {"core\\": "core"},
-		"psr-4": {"lib\\": "lib"}
+        "psr-4": {"core\\": "core"}
     }
 }

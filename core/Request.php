@@ -10,9 +10,6 @@ class  Request
      * @var \swoole_http_request
      */
     public  $request;
-    public  $response;
-    public  $redis;
-    public  $db;
 
     private $_cookie;
     private $_session;
@@ -31,16 +28,15 @@ class  Request
     public  $_action;
     public  $_client_ip;
 
-    public  function __construct(&$request ,&$response)
+    public  function __construct(&$request)
     {
         $this->request = $request;
-        $this->response = $response;
 
         $this->parseRequest($request);
         $this->session_start();
     }
 
-    public  function  parseRequest( &$request )
+    public function  parseRequest( &$request )
     {
         $this->_cookie = $request->cookie;
         $this->_get = $request->get;
@@ -69,7 +65,7 @@ class  Request
     /**
     * 模拟实现session 机制
     */
-    public  function  session_start(  )
+    public function  session_start(  )
     {
         $sessionId = $this->getSessionId();
         if(empty($sessionId)){
@@ -87,14 +83,17 @@ class  Request
         $this->_session_id = $sessionId;
     }
 
-    public function getSessionId()
+    public function   getSessionId()
     {
         if($this->_session_id){
             return $this->_session_id;
         }
+        $sessionId = '';
         if(defined("SESSION_TYPE")&&SESSION_TYPE=='get'){
             $sessionId = isset($this->_get['access_token'])?$this->_get['access_token']:'';
-        }else if( !empty($this->request->cookie) && isset( $this->request->cookie['SMALLAPI_SES'] ) ) {
+        }
+        //为了兼容浏览器
+        if( empty($sessionId) && !empty($this->request->cookie) && isset( $this->request->cookie['SMALLAPI_SES'] ) ) {
             $sessionId = $this->request->cookie[ SESSION_COOKIE_NAME ];
         }
 
@@ -105,9 +104,8 @@ class  Request
         if(empty($sessionId)) {
             $sessionId = $this->makeSessionId();
             #http_response->cookie(string $key, string $value = '', int $expire = 0 , string $path = '/', string $domain  = '', bool $secure = false , bool $httponly = false);
-            $this->response->cookie( SESSION_COOKIE_NAME, $sessionId );
+
         }
-        echo "Session id :".$sessionId."\n";
         $this->_session_id = $sessionId;
         return $sessionId;
     }
@@ -125,7 +123,7 @@ class  Request
         return $session_id;
     }
 
-    public  function setSession($key ,$value)
+    public  function  setSession($key ,$value)
     {
         $this->_session_id = $this->getSessionId();
         if(!empty($this->_session_id)){
@@ -139,7 +137,6 @@ class  Request
 
     public  function  getSession($key)
     {
-
         if( !empty($this->_session_id) ) {
             return \ALL::$app->redis->hGet( $this->_session_id ,$key);
         }else{

@@ -16,7 +16,7 @@ class WsResponse extends  BaseResponse
     public $client_fd;
     public $server;
     public $status;
-    public $cookieData;
+
     /***
      * WsResponse constructor.
      * @param $server
@@ -40,29 +40,17 @@ class WsResponse extends  BaseResponse
         }
     }
 
-    public function setCookie($cookieData)
-    {
-        $this->cookieData = $cookieData;
-    }
 
     /***
      * @param $msg_body
      * @param string $type 数据类型
      * @internal param 输出数据类型 $body
      */
-    public function output($msg_body ,$type='')
+    public function output($msg_body ,$status=0)
     {
-        if($type) {
-            $data['type'] = $type;
-        } else{
-            $data['type'] = 'msg';
+        if(!$status){
+            $status = $this->status;
         }
-        $data['status'] = $this->status;
-        if(!empty($this->cookieData)) {
-            $data['cookie'] = $this->cookieData;
-        }
-        $data['data'] = $msg_body;
-        $data = json_encode($data);
-        $this->server->push($this->client_fd, $data);
+        \All::push($this->client_fd,$msg_body,'frame',$status);
     }
 }

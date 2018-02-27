@@ -11,9 +11,11 @@ class   Controller extends Container {
      */
     public  $request;
     public  $user = null;
-    public  function  __construct( $request  )
+    public  $response = '';
+    public  function  __construct( $request ,$response )
     {
         $this->request = $request;
+        $this->response = $response;
         $user_session = $this->request->getSession('user');
         $user_session = json_decode($user_session,true);
         $this->user = $user_session;
@@ -51,7 +53,7 @@ class   Controller extends Container {
 
     public function header($key ,$value)
     {
-        $this->request->response->header($key,$value);
+        $this->response->header($key,$value);
     }
 
     public  function  isAjax()
@@ -175,7 +177,6 @@ class   Controller extends Container {
         {
             return   "模板文件不存在 ".APP_PATH."/view/".$filePath;
         }
-        //var_dump(All::$app->view);
         return \All::$app->view->render($filePath,$data);
         //$loader = new Twig_Loader_String();
         //$twig =   new \Twig_Environment($loader);

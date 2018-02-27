@@ -43,7 +43,6 @@ class RedisClient extends Component
             return 2;
         }
         $this->redis = $redisCli;
-        echo "redis 连接成功 \n";
         return 0;
     }
 

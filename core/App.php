@@ -23,7 +23,8 @@ class App extends Component{
     private $_definitions = [];
 
      //App参数
-     public    $params = array();
+     public  $params = array();
+     public  $dynamic_params = array();
 
      public function __construct(array  $config)
      {
@@ -32,6 +33,9 @@ class App extends Component{
          }
          if(isset($config['params'])){
              $this->params = $config['params'];
+         }
+         if(isset($config['dynamic_params'])) {
+             $this->dynamic_params = $config['dynamic_params'];
          }
      }
 
